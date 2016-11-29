@@ -1,0 +1,300 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+    <link rel="stylesheet" href="css/bootstrap-datetimepicker.css">
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="js/gmaps.js"></script>
+    <script src="js/newevent.js"></script>
+    <script src="js/userMaintainance.js"></script>
+    <script src="js/moment.js"></script>
+    <script src="js/bootstrap-datetimepicker.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js"></script>
+
+    <link rel="stylesheet" href="css/navbar.css">
+    <style>
+        #eventDetailMap {
+            height: 400px;
+            
+        }
+    </style>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var parameters = location.search.substring(1);
+            if (parameters.indexOf("&") != -1)
+            {
+                parameters = parameters.split("&");
+                var temp = parameters[0].split("=");
+                lat = parameters[1].split("=")[1].split(",")[0];
+                long = parameters[1].split("=")[1].split(",")[1];
+                getEventById(unescape(temp[1]),document.URL);
+            }
+            else {
+                var temp = parameters.split("=");
+                getEventById(unescape(temp[1]), document.URL);
+            }
+            
+            
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            var sessionStorage_transfer = function (event) {
+                if (!event) { event = window.event; } // ie suq
+                if (!event.newValue) return;          // do nothing if no value to work with
+                if (event.key == 'getSessionStorage') {
+                    // another tab asked for the sessionStorage -> send it
+                    localStorage.setItem('sessionStorage', JSON.stringify(sessionStorage));
+                    // the other tab should now have it, so we're done with it.
+                    localStorage.removeItem('sessionStorage'); // <- could do short timeout as well.
+                } else if (event.key == 'sessionStorage' && !sessionStorage.length) {
+                    // another tab sent data <- get it
+                    var data = JSON.parse(event.newValue);
+                    for (var key in data) {
+                        sessionStorage.setItem(key, data[key]);
+                    }
+                }
+            };
+
+            // listen for changes to localStorage
+            if (window.addEventListener) {
+                window.addEventListener("storage", sessionStorage_transfer, false);
+            } else {
+                window.attachEvent("onstorage", sessionStorage_transfer);
+            };
+
+
+            // Ask other tabs for session storage (this is ONLY to trigger event)
+            if (!sessionStorage.length) {
+                localStorage.setItem('getSessionStorage', 'loginStatus');
+                localStorage.removeItem('getSessionStorage', 'loginStatus');
+                localStorage.setItem('getSessionStorage', 'userDetail');
+                localStorage.removeItem('getSessionStorage', 'userDetail');
+            };
+        });
+    </script>
+
+    <title>MSD Project</title>
+
+</head>
+<body onload="checkUserLogin()">
+    <div id="fb-root"></div>
+    <script>
+(function (d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.5";
+    fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" rel="home" href="index.html" title="What's Happening Around Me'">
+                    <img style="max-width:100px; margin-top: -7px;"
+                         src="images/Drawing.png">
+                </a>
+            </div>
+            <div class="collapse navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li id="userName" class="active"></li>
+                    <li id="myaccount">
+                        <a href="#" data-toggle="modal" data-target="#bannerformmodal" onclick="display_details()">My Account</a>
+
+                        <div class="modal fade bannerformmodal" tabindex="-1" role="dialog" aria-labelledby="bannerformmodal" aria-hidden="true" id="bannerformmodal">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                            <h4 class="modal-title" id="myModalLabel">Account Details</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form id="requestacallform" method="POST" name="requestacallform">
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-user"></i>First Name:</span>
+                                                        <input id="myacc_first_name" type="text" class="form-control" value="" name="first_name" />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-user"></i>Last Name</span>
+                                                        <input id="myacc_last_name" type="text" class="form-control" value="" name="last_name" />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-envelope"></i>Email id:</span>
+                                                        <input id="myacc_email" type="text" class="form-control" value="" name="email1" readonly />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-group"></i>Address:</span>
+                                                        <input id="myacc_address" type="text" class="form-control" value="" name="address" />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="input-group modal-sm">
+                                                        <span class="input-group-addon"><i class="fa fa-phone"></i>City:</span>
+                                                        <input id="myacc_city" type="text" class="form-control" value="" name="city" />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="input-group modal-sm">
+                                                        <span class="input-group-addon"><i class="fa fa-phone"></i>State:</span>
+                                                        <input id="myacc_state" type="text" class="form-control" value="" name="state" />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="input-group modal-sm">
+                                                        <span class="input-group-addon"><i class="fa fa-phone"></i>Zipcode:</span>
+                                                        <input id="myacc_zipcode" type="text" class="form-control" value="" name="zipcode" />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-phone"></i>Phone:</span>
+                                                        <input id="myacc_phone" data-minlength="10" type="text" class="form-control" value="" name="phone" />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-phone"></i>New Password:</span>
+                                                        <input id="myacc_newpassword" data-minlength="6" type="password" class="form-control" value="" name="newpass" />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="btn-group" role="group">
+                                                        <div id="prefDiv" class="btn-group" role="group">
+                                                            <div id="prefDd" class="btn-group dropdown" role="group">
+                                                                <button id="drpdwn" class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" onclick='prefChange()'>
+                                                                    Preference
+                                                                    <span class="caret"></span>
+                                                                </button>
+
+                                                            </div>
+                                                        </div>
+                                                        <button id="plus" type="button" class="btn btn-default" data-type="plus" onclick='addPref()'>
+                                                            <span class="glyphicon glyphicon-plus"></span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-blue" data-dismiss="modal" aria-hidden="true">Close</button>
+                                            <button type="button" class="btn btn-blue" id="myacc_submit" onclick="updateProfile()">Submit</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li id="registerNav"><a href="register.html"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+                    <li id="loginNav"><a href="login.html"><span class="glyphicon glyphicon-log-in"></span> Log In</a></li>
+                    <li id="logoutNav"><a href="#" onclick="logout()"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+                    <li><a href="#"><span class="glyphicon glyphicon-info-sign"></span> Help</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-8" style="padding:5px 5px 5px 35px">
+                    <div class="row">
+                        <div id="title">
+                            <!-- The event title goes here -->
+                        </div>
+                    </div>
+                    <div class="row">
+                        <h4> Description </h4>
+                        <div id="description">
+                            <!-- The event description goes here -->
+                        </div>
+                    </div>
+                    <div class="row">
+                        <h4> Venue </h4>
+                        <div id="venue">
+                            <!-- The event venue name goes here -->
+                        </div>
+                    </div>
+                    <div class="row">
+                        <h4> Where </h4>
+                        <div id="where">
+                            <!-- The event location goes here -->
+                        </div>
+                    </div>
+                    <div class="row">
+                        <h4> When </h4>
+                        <div id="fromdate">
+                            <h5> From </h5>
+                            <!-- The event date and time goes here -->
+                        </div>
+                        <div id="todate">
+                            <h5> To </h5>
+                            <!-- The event date and time goes here -->
+                        </div>
+                    </div>
+                    <div id="perfInfo" class="row">
+                        <h4> Performers </h4>
+                        <div id="performers">
+                            <!-- The event description goes here -->
+                        </div>
+                    </div>
+                <div class="row">
+                    <div class="fb-share-button"
+                         data-layout="button_count">
+                    </div>
+                    <div style="padding: 5px 0px 0px 0px">
+                        <a href="https://twitter.com/share" class="twitter-share-button" {count}>Tweet</a>
+                        <script>!function (d, s, id) { var js, fjs = d.getElementsByTagName(s)[0], p = /^http:/.test(d.location) ? 'http' : 'https'; if (!d.getElementById(id)) { js = d.createElement(s); js.id = id; js.src = p + '://platform.twitter.com/widgets.js'; fjs.parentNode.insertBefore(js, fjs); } }(document, 'script', 'twitter-wjs');</script>
+                    </div>
+                    </div>
+                    <div class="row">
+                        <h4> More Info </h4>
+                        <div id="moreInfo">
+                            <!-- More info with link goes here -->
+                        </div>
+                    </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div id="eventimage" style="padding:5px 5px 15px 5px">
+                            <!-- <img src="images/event.png"> -->
+                            <!-- The event image goes here -->
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div id="eventDetailMap" style="padding:15px 5px 15px 5px">
+                            <!-- The event location on map goes here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="footer">
+        <div class="container-fluid">
+            <p class="muted credit">Copyright© 2015 Team KHAS</p>
+        </div>
+    </footer>
+</body>
+</html>

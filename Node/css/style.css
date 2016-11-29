@@ -1,0 +1,37 @@
+/*
+       AUTHOR:     SUDHANSHU JOSHI & KARTHIK KAIPA
+       FILE TYPE:  JAVASCRIPT
+       DISCLAIMER: THIS CODE HAS BEEN DONE AS A PART OF MANAGING SOFTWARE DEVELOPMENT COURSE
+       TERM:       FALL 2015
+       PROFESSOR:  MICHAEL ALLEN WEINTRAUB
+       UNIVERSITY: NORTHEASTERN UNIVERSITY, BOSTON
+
+       APIs used: 
+       Eventful API: For getting event information.
+       Google maps API: For showing the location of the events to user
+*/
+
+html, body, .full-height {
+    height: 100%;
+}
+#well1 {
+    height: 15%; /*fall back for IE8, Safari 5.1, Opera Mini and pre-4.4 Android browsers*/
+    height: calc(15% - 20px);
+    overflow: hidden; /*better to decide how you want to handle this than to let the browser decide*/
+}
+#well2 {
+    height: 480px;
+    margin-bottom: 0;
+    overflow: auto;
+    font-size:12px;
+}
+
+#results {
+	text-align: center;
+    word-wrap:break-word;
+}
+
+td {
+    vertical-align:top;
+    text-align:left;
+}

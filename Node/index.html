@@ -1,0 +1,306 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://raw.githubusercontent.com/flatlogic/awesome-bootstrap-checkbox/master/awesome-bootstrap-checkbox.css" />    
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+    <link rel="stylesheet" href="css/bootstrap-datetimepicker.css">
+    <link rel="stylesheet" href="css/style.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="js/gmaps.js"></script>
+    <script src="js/newevent.js"></script>
+    <script src="js/moment.js"></script>
+    <script src="js/userMaintainance.js"></script>
+    <script src="js/bootstrap-datetimepicker.min.js"></script>
+    <script src="js/bootstrap-checkbox.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js"></script>
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="node_modules/bootstrap-select/dist/css/bootstrap-select.css">
+    <script src="node_modules/bootstrap-select/dist/js/bootstrap-select.js"></script>
+    <style>
+        #map {
+            height: 700px;
+        }
+    </style>
+    <script type="text/javascript">
+        $(function () {
+            $('#datetimepicker6').datetimepicker();
+            $('#datetimepicker7').datetimepicker({
+                useCurrent: false //Important! See issue #1075
+            });
+            $("#datetimepicker6").on("dp.change", function (e) {
+                $('#datetimepicker7').data("DateTimePicker").minDate(e.date);
+            });
+            $("#datetimepicker7").on("dp.change", function (e) {
+                $('#datetimepicker6').data("DateTimePicker").maxDate(e.date);
+            });
+        });
+        $(document).ready(function () {
+            $("#fromdate").focusout(function () {
+                var date = $("#fromdate").val();
+                $("#todate").val(date);
+            });
+            $("#results").hide();
+        })
+    </script>
+    <script>
+        $(function () {
+            $('#slideBar').on('input', function () {
+                $('.distancerange').html(this.value);
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            var sessionStorage_transfer = function (event) {
+                if (!event) { event = window.event; } // ie suq
+                if (!event.newValue) return;          // do nothing if no value to work with
+                if (event.key == 'getSessionStorage') {
+                    // another tab asked for the sessionStorage -> send it
+                    localStorage.setItem('sessionStorage', JSON.stringify(sessionStorage));
+                    // the other tab should now have it, so we're done with it.
+                    localStorage.removeItem('sessionStorage'); // <- could do short timeout as well.
+                } else if (event.key == 'sessionStorage' && !sessionStorage.length) {
+                    // another tab sent data <- get it
+                    var data = JSON.parse(event.newValue);
+                    for (var key in data) {
+                        sessionStorage.setItem(key, data[key]);
+                    }
+                }
+            };
+
+            // listen for changes to localStorage
+            if (window.addEventListener) {
+                window.addEventListener("storage", sessionStorage_transfer, false);
+            } else {
+                window.attachEvent("onstorage", sessionStorage_transfer);
+            };
+
+
+            // Ask other tabs for session storage (this is ONLY to trigger event)
+            localStorage.setItem('getSessionStorage', 'loginStatus');
+            localStorage.removeItem('getSessionStorage', 'loginStatus');
+            localStorage.setItem('getSessionStorage', 'userDetail');
+            localStorage.removeItem('getSessionStorage', 'userDetail');
+        });
+    </script>
+
+    <title>MSD Project</title>
+
+</head>
+<body onload="checkUserLogin()">
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" rel="home" href="index.html" title="What's Happening Around Me'">
+                    <img style="max-width:100px; margin-top: -7px;"
+                         src="images/Drawing.png">
+                </a>
+            </div>
+            <div class="collapse navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li id="userName" class="active"></li>
+                    <li id="myaccount">
+                        <a href="#" data-toggle="modal" data-target="#bannerformmodal" onclick="display_details()">My Account</a>
+
+                        <div class="modal fade bannerformmodal" tabindex="-1" role="dialog" aria-labelledby="bannerformmodal" aria-hidden="true" id="bannerformmodal">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                            <h4 class="modal-title" id="myModalLabel">Account Details</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form id="requestacallform" method="POST" name="requestacallform">
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-user"></i>First Name:</span>
+                                                        <input id="myacc_first_name" type="text" class="form-control" value="" name="first_name" />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-user"></i>Last Name</span>
+                                                        <input id="myacc_last_name" type="text" class="form-control" value="" name="last_name" />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-envelope"></i>Email id:</span>
+                                                        <input id="myacc_email" type="text" class="form-control" value="" name="email1" readonly />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-group"></i>Address:</span>
+                                                        <input id="myacc_address" type="text" class="form-control" value="" name="address" />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="input-group modal-sm">
+                                                        <span class="input-group-addon"><i class="fa fa-phone"></i>City:</span>
+                                                        <input id="myacc_city" type="text" class="form-control" value="" name="city" />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="input-group modal-sm">
+                                                        <span class="input-group-addon"><i class="fa fa-phone"></i>State:</span>
+                                                        <input id="myacc_state" type="text" class="form-control" value="" name="state" />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="input-group modal-sm">
+                                                        <span class="input-group-addon"><i class="fa fa-phone"></i>Zipcode:</span>
+                                                        <input id="myacc_zipcode" type="text" class="form-control" value="" name="zipcode" />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-phone"></i>Phone:</span>
+                                                        <input id="myacc_phone" data-minlength="10" type="text" class="form-control" value="" name="phone" />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-phone"></i>New Password:</span>
+                                                        <input id="myacc_newpassword" data-minlength="6" type="password" class="form-control" value="" name="newpass" />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    
+                                                    <label for="prefs" class="control-label">Preferences</label>
+                                                    <select class="selectpicker show-tick" data-width="100%" id="prefs" multiple data-max-options="5" required>
+                                                        <option id="art" value="art">Art</option>
+                                                        <option id="books" value="books">Books</option>
+                                                        <option id="comedy" value="comedy">Comedy</option>
+                                                        <option id="food" value="food">Food</option>
+                                                        <option id="music" value="music">Music</option>
+                                                        <option id="sales" value="sales">Sales</option>
+                                                        <option id="science" value="science">Science</option>
+                                                        <option id="sports" value="sports">Sports</option>
+                                                        <option id="technology" value="technology">Technology</option>
+                                                    </select>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-blue" data-dismiss="modal" aria-hidden="true">Close</button>
+                                            <button type="button" class="btn btn-primary" id="myacc_submit" onclick="updateProfile()">Submit</button>
+                                            <button type="button" class="btn btn-danger pull-left" id="myacc_submit" onclick="deleteUser()">Delete Profile</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li id="registerNav"><a href="register.html"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+                    <li id="loginNav"><a href="login.html"><span class="glyphicon glyphicon-log-in"></span> Log In</a></li>
+                    <li id="logoutNav"><a href="#" onclick="logout()"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+                    <li><a href="readme.html"><span class="glyphicon glyphicon-info-sign"></span> Help</a></li>
+                </ul>
+            </div>
+        </div>
+</nav>
+    <div class="jumbotron">
+        <div class="container" id="jumbo">
+            <h1>
+                Find Events That You like.
+            </h1>
+            <div class="row" id="checkrow">
+
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-8">
+                <div id="map">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-10">
+                        <div class="row">
+                            <label for="search">Search:</label>
+                            <input type="text" class="form-control" id="search" placeholder="Enter keywords to search event">
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="row">
+                            <div class="form-group" style="padding:10px 5px 10px 0px">
+                                <div class='input-group date' id='datetimepicker6'>
+                                    <input type='text' class="form-control" id="fromdate" />
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="row">
+                            <div class="form-group" style="padding:10px 0px 10px 5px">
+                                <div class='input-group date' id='datetimepicker7'>
+                                    <input type='text' class="form-control" id="todate" />
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="row">
+                            <label for="distance">Distance: </label>
+                            <span class="distancerange">5</span> miles
+                            <input type="range" id="slideBar" min="2" max="40" step="1" value="5">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="row" style="padding-top:10px">
+                            <input type="button" class="btn btn-primary" id="search" value="Search" onclick="getEvents()">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                        <div class="md-col-10">
+                        
+                            <div id="well2">
+
+                                <table class="table table-striped" id="results">
+                                    <thead>
+                                        <tr>
+                                            <th>Events:</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tableBody">
+                                        <tr id="template">
+                                            <td><a href="#" class="link">CS5500 class</a></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+    <footer class="footer">
+        <div class="container-fluid">
+            <p class="muted credit">Copyright© 2015 Team KHAS</p>
+        </div>
+    </footer>
+</body>
+</html>
