@@ -51,6 +51,9 @@ var markersarray = [];
 			
 		}
 
+function insertEvents(respose){
+	
+}
 
 		function renderEvents(response)
 	{

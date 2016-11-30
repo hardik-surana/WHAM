@@ -38,17 +38,18 @@ function getNextSequence(name) {
 }
 
 function getPersonId(email) {
+	console.log("In getPerson function");
     var myCursor =  db.collection("Person").find({
         email : email
     });
 
     var myDocument = myCursor.hasNext() ? myCursor.next() : null;
-
+	
     if (myDocument) {
         var id = myDocument._id;
-        print (tojson(id));
+        console.log(tojson(id));
     }
-
+	
     return id;
 }
 
@@ -337,7 +338,7 @@ app.post('/login', function (req, res) {
 
     // sets a cookie with the user's info
     req.session.user = email;
-
+	console.log(req.session.user);
     MongoClient.connect(url, function(err, db) {
         assert.equal(null, err);
 
@@ -345,6 +346,7 @@ app.post('/login', function (req, res) {
 
             if(err){
                 res.json(errObj);
+				console.log(errObj);
             }
             else if(result2){
                 if(result2.password==pwd){
@@ -764,6 +766,9 @@ app.post('/removeevent', function (req, res) {
         });
     });
 });
+process.on('uncaughtException', function (err) {
+  console.log('Caught exception: ' + err);
+});
 
 app.get('/logout', function(req, res) {
     res.json({ status: "success", message: "User session ended" });
@@ -771,3 +776,4 @@ app.get('/logout', function(req, res) {
 
 app.listen(3000,function(){
 });
+

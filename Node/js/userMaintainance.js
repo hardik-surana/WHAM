@@ -91,6 +91,7 @@ function checkUserLogin() {
         $("#registerNav").hide();
         $("#loginNav").hide();
         $("#logoutNav").show();
+        //$('#admin').show();
         $("#myaccount").show();
         $("#userName").append("<a><span class='glyphicon glyphicon-user'></span> Hi! " + userData.last_name + ", " + userData.first_name + "</a>");
         $("#jumbo").attr("class", "container-fluid");
@@ -104,8 +105,10 @@ function checkUserLogin() {
         }
     }
     else {
+        //$('#manageUsers').hide();
+        //$('#manageEvents').hide();
         $("#logoutNav").hide();
-        $("#myaccount").hide();
+        //$("#myaccount").hide();
     }
 }
 
@@ -135,7 +138,13 @@ function prefChange() {
     });
 
 };
+function displayUsers(){
+    
+}
 
+function displayUnapprovedEvents(){
+     
+}
 function display_details() {
 
     var userData = JSON.parse(sessionStorage.getItem('userDetail'));
