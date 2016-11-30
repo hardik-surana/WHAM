@@ -1,13 +1,6 @@
-/*
- AUTHOR:     HARDIK SURANA & SUDHANSHU JOSHI
- FILE TYPE:  JAVASCRIPT
- DISCLAIMER: THIS CODE HAS BEEN DONE AS A PART OF DATABASE MANAGEMENT COURSE
- TERM:       FALL 2016
- PROFESSOR:  KENNETH BACKLWASKI
- UNIVERSITY: NORTHEASTERN UNIVERSITY, BOSTON
-
+/**
+ * Created by Hardik on 11/29/2016.
  */
-
 
 var express = require('express');
 var app = express();
@@ -31,30 +24,59 @@ var assert = require('assert');
 var ObjectId = require('mongodb').ObjectID;
 var url = 'mongodb://localhost:27017/CS5200';
 
-
 //DB Functions
-function insertUser (db, callback) {
-    db.collection('user_detail').insertOne({
-        "username": username,
-        "password": pwd,
+function getNextSequence(name) {
+    var ret = db.counters.findAndModify(
+        {
+            query: { _id: name },
+            update: { $inc: { seq: 1 } },
+            new: true
+        }
+    );
+
+    return ret.seq;
+}
+
+function getPersonId(email) {
+    var myCursor =  db.collection("Person").find({
+        email : email
+    });
+
+    var myDocument = myCursor.hasNext() ? myCursor.next() : null;
+
+    if (myDocument) {
+        var id = myDocument._id;
+        print (tojson(id));
+    }
+
+    return id;
+}
+
+function insertPerson (db, callback) {
+    db.collection('Person').insertOne({
+        "_id": getNextSequence("personid"),
         "first_name": fname,
         "last_name": lname,
-        "address_line1": addrline1,
-        "address_line2": addrline1,
+        "email": email,
+        "phone": phone,
+        "password": pwd,
+        "address_line1": adl1,
+        "address_line2": adl2,
         "city": city,
         "state": state,
-        "zip": zip,
-        "phone": phone
+        "zipcode": zip,
+        "is_admin": 0,
+        "is_enable": 1
 
     }, function(err, dbresult) {
-
         callback(err,dbresult);
     });
 }
 
-function insertPreference (db, callback) {
-    db.collection('user_preference').insertOne({
-        "username": username,
+
+function insertPref (db, callback)  {
+    db.collection('User').insertOne({
+        "_id": getPersonId(email),
         "preference": preferences
 
     }, function(err, dbresult) {
@@ -62,10 +84,20 @@ function insertPreference (db, callback) {
     });
 }
 
+
+
 function findUser (db, callback) {
-    var cursor =db.collection('user_detail').find({
-        "username": username
+    var cursor =db.collection('Person').find({
+        "email": email
     } );
+
+    cursor.next(function(err, doc) {
+        callback(err,doc);
+    });
+}
+
+function findAllUser (db, callback) {
+    var cursor =db.collection('Person').find();
 
     cursor.next(function(err, doc) {
         callback(err,doc);
@@ -73,8 +105,8 @@ function findUser (db, callback) {
 }
 
 function findUserPreference (db, callback) {
-    var cursor =db.collection('user_preference').find({
-        "username": username
+    var cursor =db.collection('Users').find({
+        "_id": getPersonId(email)
     } );
     cursor.next(function(err, doc) {
         callback(err,doc);
@@ -82,46 +114,110 @@ function findUserPreference (db, callback) {
 }
 
 function updateDetail (db, callback) {
-    db.collection('user_detail').updateOne(
+    db.collection('Person').updateOne(
 
-        { "username" : username },
+        { "email" : email },
         {
-            $set: {"password": pwd,
-                "first_name": fname,
+            $set: {"first_name": fname,
                 "last_name": lname,
-                "address_line1": addrline1,
-                "address_line2": addrline1,
+                "phone": phone,
+                "password": pwd,
+                "address_line1": adl1,
+                "address_line2": adl2,
                 "city": city,
-                "state": state ,
-                "zip": zip,
-                "phone": phone}
+                "state": state,
+                "zipcode": zip,
+                "is_admin": isadmin,
+                "is_enable": isenable}
         }, function(err, dbresult) {
             callback(err,dbresult);
         });
 }
 
 function updatePreference (db, callback) {
-    db.collection('user_preference').updateOne(
+    db.collection('Users').updateOne(
 
-        { "username" : username },
+        { "_id" : id },
         {
-            $set: { "preference": preferences },
+            $set: { "preference": preferences }
         }, function(err, dbresult) {
             callback(err,dbresult);
         });
 }
 
-function removeUser (db, callback) {
-    db.collection('user_detail').deleteMany(
-        { "username": username },
+function deleteUser (db, callback) {
+    db.collection('Person').deleteMany(
+        { "email": email },
         function(err, dbresult) {
             callback(err,dbresult);
         });
 }
 
-function removePreference (db, callback) {
-    db.collection('user_preference').deleteMany(
-        { "username": username },
+function deletePreference (db, callback) {
+    db.collection('Users').deleteMany(
+        { "_id": id },
+        function(err, dbresult) {
+            callback(err,dbresult);
+        });
+}
+
+
+///////////////////////////////////////////////////
+
+function insertEvent(db, callback) {
+    db.collection('Events').insertOne({
+        "_id": getNextSequence("eventid"),
+        "name": name,
+        "description": desc,
+        "date": date,
+        "time": time,
+        "tickets": tickets,
+        "address_line1": adl1,
+        "address_line2": adl2,
+        "city": city,
+        "state": state,
+        "zipcode": zip,
+        "latitute": lat,
+        "longitude": lon,
+        "is_approved": 0
+
+    }, function (err, dbresult) {
+        callback(err, dbresult);
+    });
+}
+
+function findEvent (db, callback) {
+    var cursor =db.collection('Events').find({
+        "city": city
+    } );
+
+    cursor.next(function(err, doc) {
+        callback(err,doc);
+    });
+}
+
+function findAllEvents(db, callback) {
+    var cursor =db.collection('Events').find();
+
+    cursor.next(function(err, doc) {
+        callback(err,doc);
+    });
+}
+
+function approveEvent (db, callback) {
+    db.collection('Events').updateOne(
+
+        { "_id" : id },
+        {
+            $set: { "is_approved": isapproved}
+        }, function(err, dbresult) {
+            callback(err,dbresult);
+        });
+}
+
+function deleteEvent (db, callback) {
+    db.collection('Events').deleteMany(
+        { "_id": id },
         function(err, dbresult) {
             callback(err,dbresult);
         });
@@ -149,30 +245,29 @@ app.get('/bye', function (req, res) {
     res.send('Leaving so soon?')
 });
 
-
-app.post('/newuser', function (req, res) {
-    //Sample: http://localhost:3000/newuser?us=abc&pw=123&fn=abc&ln=def&adl1=st&adl2=st2&cty=Blr&ste=KA&zp=02115&ph=8579991577
+app.post('/addperson', function (req, res) {
+    //Sample: http://localhost:3000/addperson
 
     var succObj = { status: "success" };
     var errObj = { status: "error", message: "Could not insert, Dup found" };
     var inserErrObj = { status: "error", message: "Could not insert, other issue" };
 
 
-    username=req.body.us;
-    pwd=req.body.pw;
     fname=req.body.fn;
     lname=req.body.ln;
-    addrline1=req.body.adl1;
-    addrline2=req.body.adl2;
+    email=req.body.email;
+    phone=req.body.ph;
+    pwd = req.body.pw;
+    adl1=req.body.adl1;
+    adl2=req.body.adl2;
     city=req.body.cty;
     state=req.body.ste;
     zip=req.body.zp;
-    phone=req.body.ph;
 
     MongoClient.connect(url, function(err, db) {
         assert.equal(null, err);
 
-        insertUser(db, function(err,result2) {
+        insertPerson(db, function(err,result2) {
             if(err){
                 res.json(errObj);
             }
@@ -194,23 +289,23 @@ app.post('/newuser', function (req, res) {
 
 });
 
-app.post('/newpref', function (req, res) {
+app.post('/addpref', function (req, res) {
 
-    //Sample: http://localhost:3000/newpref?us=abc&pref=music,pubs,games
+    //Sample: http://localhost:3000/newpref
 
     var succObj = { status: "success" };
     var errObj = { status: "error", message: "Could not insert, Dup found" };
     var inserErrObj = { status: "error", message: "Could not insert, other issue" };
 
 
-    username=req.body.us;
+    email=req.body.email;
     preferences=req.body.pref;
 
 
     MongoClient.connect(url, function(err, db) {
         assert.equal(null, err);
 
-        insertPreference(db, function(err,result2) {
+        insertPref(db, function(err,result2) {
             if(err){
                 res.json(errObj);
             }
@@ -229,9 +324,7 @@ app.post('/newpref', function (req, res) {
             db.close();
         });
     });
-
 });
-
 
 app.post('/login', function (req, res) {
     //Sample: http://localhost:3000/login
@@ -239,11 +332,11 @@ app.post('/login', function (req, res) {
     var errObj = { status: "error", message: "Username Not Found" };
     var pwdErrObj = { status: "error", message: "Username Found, Invalid password" };
 
-    username=req.body.email;
+    email=req.body.email;
     pwd=req.body.pwd;
 
     // sets a cookie with the user's info
-    req.session.user = username;
+    req.session.user = email;
 
     MongoClient.connect(url, function(err, db) {
         assert.equal(null, err);
@@ -261,33 +354,50 @@ app.post('/login', function (req, res) {
 
                         if(err){
                             res.json(errObj);
-                        }
-                        else if(result3){
+                        } else if(result3){
                             result3.status="success";
 
-                            var merged_object = JSON.parse((JSON.stringify(result2) + JSON.stringify(result3)).replace(/}{/g,","));
+                            var merged_object = JSON.parse((JSON.stringify(result2) +
+                            JSON.stringify(result3)).replace(/}{/g,","));
 
                             res.json(merged_object);
 
-                        }
-                        else
-                        {
+                        } else {
                             res.json(errObj);
                         }
                         db.close();
                     });
 
-                }else{
+                } else{
                     res.json(pwdErrObj);
                 }
-            }
-            else{
+            } else{
 
                 res.json(errObj);
             }
         });
     });
+});
 
+app.post('/findallusers', function (req, res) {
+    //Sample: http://localhost:3000/findallusers
+
+    var errObj = { status: "error", message: "Username Not Found" };
+
+    MongoClient.connect(url, function(err, db) {
+        assert.equal(null, err);
+
+        findAllUser(db, function(err,result2) {
+
+            if(err){
+                res.json(errObj);
+            } else if(result2){
+                result2.status="success";
+            } else{
+                res.json(errObj);
+            }
+        });
+    });
 });
 
 app.post('/checkuserpref', function (req, res) {
@@ -295,8 +405,7 @@ app.post('/checkuserpref', function (req, res) {
 
     var errObj = { status: "error", message: "Username Not Found" };
 
-    username=req.body.us;
-
+    id=req.body.id;
 
     MongoClient.connect(url, function(err, db) {
         assert.equal(null, err);
@@ -305,39 +414,36 @@ app.post('/checkuserpref', function (req, res) {
 
             if(err){
                 res.json(errObj);
-            }
-            else if(result2){
+            } else if(result2){
                 result2.status="success";
                 res.json(result2);
-            }
-            else
-            {
+            } else{
                 res.json(errObj);
             }
         });
     });
-
 });
 
-
 app.post('/updateuser', function (req, res) {
-    //Sample: http://localhost:3000/updateuser?us=abc&pw=123&fn=abc&ln=def&adl1=st&adl2=st2&cty=Blr&ste=KA&zp=02115&ph=8579991577
+    //Sample: http://localhost:3000/updateuser
     //Make username non changeable
 
     var succObj = { status: "success" };
     var errObj = { status: "error", message: "Could not update, user not found" };
     var updErrObj = { status: "error", message: "Could not update, other issue" };
 
-    username=req.body.us;
-    pwd=req.body.pw;
+    email=req.body.email;
     fname=req.body.fn;
     lname=req.body.ln;
-    addrline1=req.body.adl1;
-    addrline2=req.body.adl2;
+    email=req.body.email;
+    phone=req.body.ph;
+    pwd = req.body.pw;
+    adl1=req.body.adl1;
+    adl2=req.body.adl2;
     city=req.body.cty;
     state=req.body.ste;
     zip=req.body.zp;
-    phone=req.body.ph;
+    isenable=req.body.isenable;
 
 
     if (req.session && req.session.user) { // Check if session exists
@@ -375,7 +481,8 @@ app.post('/updatepref', function (req, res) {
     var errObj = { status: "error", message: "Could not update, user not found" };
     var updErrObj = { status: "error", message: "Could not update, other issue" };
 
-    username=req.body.us;
+    id=req.body.id;
+    email=req.body.email;
     preferences=req.body.pref;
 
 
@@ -384,7 +491,7 @@ app.post('/updatepref', function (req, res) {
         MongoClient.connect(url, function(err, db) {
             assert.equal(null, err);
 
-            updatePreference(db, function(err,result2) {
+            updatePreference (db, function(err,result2) {
                 if(err){
                     res.json(errObj);
                 }
@@ -394,41 +501,34 @@ app.post('/updatepref', function (req, res) {
 
                             if(err){
                                 res.json(errObj);
-                            }
-                            else if(result2){
+                            }  else if(result2){
                                 result2.status="success";
 
                                 findUserPreference(db, function(err,result3) {
 
                                     if(err){
                                         res.json(errObj);
-                                    }
-                                    else if(result3){
+                                    } else if(result3){
                                         result3.status="success";
 
-                                        var merged_object = JSON.parse((JSON.stringify(result2) + JSON.stringify(result3)).replace(/}{/g,","));
+                                        var merged_object = JSON.parse((JSON.stringify(result2) +
+                                        JSON.stringify(result3)).replace(/}{/g,","));
 
                                         res.json(merged_object);
 
-                                    }
-                                    else
-                                    {
+                                    } else {
                                         res.json(errObj);
                                     }
                                 });
-
-                            }
-                            else{
+                            } else {
 
                                 res.json(errObj);
                             }
                         });
-                    }
-                    else{
+                    } else {
                         res.json(errObj);
                     }
-                }
-                else{
+                } else{
 
                     res.json(updErrObj);
                 }
@@ -442,26 +542,57 @@ app.post('/updatepref', function (req, res) {
 
 });
 
-app.get('/removeuser', function (req, res) {
-    //Sample: http://localhost:3000/removeuser?us=abc
+app.post('/removeuser', function (req, res) {
+    //Sample: http://localhost:3000/removeuser?email=
     //Make username non changeable
 
     var succObj = { status: "success", message: "User Removed" };
     var errObj = { status: "error", message: "Could not remove, user not found" };
     var remErrObj = { status: "error", message: "Could not remove, other issue" };
 
-    username=req.query.us;
-
+    email=req.query.email;
 
     MongoClient.connect(url, function(err, db) {
         assert.equal(null, err);
 
-        removeUser(db, function(err,result2) {
+        deleteUser(db, function(err,result2) {
             if(err){
                 res.json(errObj);
             }
             else if(result2){
+                if(result2.result.n==1){
+                    res.json(succObj);
+                } else{
+                    res.json(errObj);
+                }
+            } else{
 
+                res.json(remErrObj);
+            }
+            db.close();
+        });
+    });
+
+});
+
+app.post('/removepref', function (req, res) {
+    //Sample: http://localhost:3000/removepref?id=123
+    //Make username non changeable
+
+    var succObj = { status: "success", message: "Preference removed" };
+    var errObj = { status: "error", message: "Could not remove, user not found" };
+    var remErrObj = { status: "error", message: "Could not remove, other issue" };
+
+    id=req.query.id;
+
+    MongoClient.connect(url, function(err, db) {
+        assert.equal(null, err);
+
+        deletePreference(db, function(err,result2) {
+            if(err){
+                res.json(errObj);
+            }
+            else if(result2){
                 if(result2.result.n==1){
                     res.json(succObj);
                 }
@@ -479,20 +610,34 @@ app.get('/removeuser', function (req, res) {
 
 });
 
-app.get('/removepref', function (req, res) {
-    //Sample: http://localhost:3000/removepref?us=abc
-    //Make username non changeable
+/////////////////////////////////////
 
-    var succObj = { status: "success", message: "Preference removed" };
-    var errObj = { status: "error", message: "Could not remove, user not found" };
-    var remErrObj = { status: "error", message: "Could not remove, other issue" };
+app.post('/addevent', function (req, res) {
+    //Sample: http://localhost:3000/addevent
 
-    username=req.query.us;
+    var succObj = { status: "success" };
+    var errObj = { status: "error", message: "Could not insert, Dup found" };
+    var inserErrObj = { status: "error", message: "Could not insert, other issue" };
+
+
+    name=req.body.name;
+    desc=req.body.desc;
+    date=req.body.date;
+    time=req.body.time;
+    tickets = req.body.tickets;
+    adl1=req.body.adl1;
+    adl2=req.body.adl2;
+    city=req.body.cty;
+    state=req.body.ste;
+    zip=req.body.zp;
+    lat=req.body.lat;
+    lon=req.body.lon;
+
 
     MongoClient.connect(url, function(err, db) {
         assert.equal(null, err);
 
-        removePreference(db, function(err,result2) {
+        insertEvent(db, function(err,result2) {
             if(err){
                 res.json(errObj);
             }
@@ -501,17 +646,123 @@ app.get('/removepref', function (req, res) {
                     res.json(succObj);
                 }
                 else{
-                    res.json(errObj);
+                    res.json(inserErrObj);
                 }
             }
             else{
+
+                res.json(errObj);
+            }
+            db.close();
+        });
+    });
+
+});
+
+
+app.post('/findevents', function (req, res) {
+    //Sample: http://localhost:3000/findevents?city=boston
+
+    var errObj = { status: "error", message: "Username Not Found" };
+
+    city=req.body.city;
+
+    MongoClient.connect(url, function(err, db) {
+        assert.equal(null, err);
+
+        findEvent(db, function(err,result2) {
+
+            if(err){
+                res.json(errObj);
+            } else if(result2){
+                result2.status="success";
+                res.json(result2);
+            } else{
+                res.json(errObj);
+            }
+        });
+    });
+});
+
+app.post('/findallevents', function (req, res) {
+    //Sample: http://localhost:3000/findallevents
+
+    var errObj = { status: "error", message: "Event Not Found" };
+
+    MongoClient.connect(url, function(err, db) {
+        assert.equal(null, err);
+
+        findAllEvents(db, function(err,result2) {
+
+            if(err){
+                res.json(errObj);
+            } else if(result2){
+                result2.status="success";
+            } else{
+                res.json(errObj);
+            }
+        });
+    });
+});
+
+app.post('/approveevent', function (req, res) {
+    //Sample: http://localhost:3000/approveevent
+    //Make username non changeable
+
+    var succObj = { status: "success" };
+    var errObj = { status: "error", message: "Could not update, user not found" };
+    var updErrObj = { status: "error", message: "Could not update, other issue" };
+
+    isapproved=req.body.isapproved;
+
+    MongoClient.connect(url, function(err, db) {
+        assert.equal(null, err);
+
+        approveEvent(db, function(err,result2) {
+            if(err){
+                res.json(errObj);
+            } else if(result2){
+                res.json(succObj);
+
+            } else{
+
+                res.json(updErrObj);
+            }
+            db.close();
+        });
+    });
+});
+
+app.post('/removeevent', function (req, res) {
+    //Sample: http://localhost:3000/removeevent?id=123
+    //Make username non changeable
+
+    var succObj = { status: "success", message: "User Removed" };
+    var errObj = { status: "error", message: "Could not remove, user not found" };
+    var remErrObj = { status: "error", message: "Could not remove, other issue" };
+
+    id=req.query.id;
+
+    MongoClient.connect(url, function(err, db) {
+        assert.equal(null, err);
+
+        deleteEvent(db, function(err,result2) {
+            if(err){
+                res.json(errObj);
+            } else if(result2){
+
+                if(result2.result.n==1){
+                    res.json(succObj);
+                } else{
+                    res.json(errObj);
+                }
+            } else{
 
                 res.json(remErrObj);
             }
             db.close();
         });
     });
-
 });
 
 app.get('/logout', function(req, res) {
