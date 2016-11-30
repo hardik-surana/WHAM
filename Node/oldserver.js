@@ -63,8 +63,8 @@ function insertPreference (db, callback) {
 }
 
 function findUser (db, callback) {
-    var cursor =db.collection('user_detail').find({
-        "username": username
+    var cursor =db.collection('Person').find({
+        "email": username
     } );
 
     cursor.next(function(err, doc) {
@@ -73,8 +73,8 @@ function findUser (db, callback) {
 }
 
 function findUserPreference (db, callback) {
-    var cursor =db.collection('user_preference').find({
-        "username": username
+    var cursor =db.collection('Users').find({
+        "_id": 999999
     } );
     cursor.next(function(err, doc) {
         callback(err,doc);

@@ -42,10 +42,10 @@ db.Person.createIndex({"email" : 1}, {"unique":true})
 db.Person.remove({"email" : "abc@def.com"})
 
 db.Person.insert({
-"_id": 99999999,
+"_id": 99999998,
 "first_name": "Sudhanshu",
 "last_name": "Joshi",
-"email": "sud@joshi.com",
+"email": "sudjoshi,
 "phone": 1234567890,
 "password": "qwerty",
 "address_line1": "123 Abc Ave",

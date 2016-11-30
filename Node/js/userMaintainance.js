@@ -20,7 +20,7 @@ function login() {
         method: 'POST',
         data: { email: emailid, pwd: password }
     }).then(function (data) {
-        //console.log(data);
+        console.log(data);
         if (data.status == "error") {
             $("#login").append("<div class='alert alert-danger' role='alert'><strong>Error:</strong> " + data.message + "</div>");
         }

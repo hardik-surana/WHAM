@@ -38,16 +38,16 @@ function getNextSequence(name) {
 }
 
 function getPersonId(email) {
-	console.log("In getPerson function");
+	
     var myCursor =  db.collection("Person").find({
         email : email
     });
-
+	
     var myDocument = myCursor.hasNext() ? myCursor.next() : null;
 	
     if (myDocument) {
         var id = myDocument._id;
-        console.log(tojson(id));
+        
     }
 	
     return id;
@@ -88,13 +88,14 @@ function insertPref (db, callback)  {
 
 
 function findUser (db, callback) {
+   
     var cursor =db.collection('Person').find({
         "email": email
     } );
-
     cursor.next(function(err, doc) {
         callback(err,doc);
     });
+    
 }
 
 function findAllUser (db, callback) {
@@ -106,9 +107,11 @@ function findAllUser (db, callback) {
 }
 
 function findUserPreference (db, callback) {
+    console.log("In find user preference");
     var cursor =db.collection('Users').find({
-        "_id": getPersonId(email)
+        "email": email
     } );
+    console.log(cursor);
     cursor.next(function(err, doc) {
         callback(err,doc);
     });
@@ -338,7 +341,7 @@ app.post('/login', function (req, res) {
 
     // sets a cookie with the user's info
     req.session.user = email;
-	console.log(req.session.user);
+	
     MongoClient.connect(url, function(err, db) {
         assert.equal(null, err);
 
@@ -349,19 +352,21 @@ app.post('/login', function (req, res) {
 				console.log(errObj);
             }
             else if(result2){
+                
                 if(result2.password==pwd){
                     result2.status="success";
 
                     findUserPreference(db, function(err,result3) {
 
                         if(err){
+                            console.log("In find prefernce error");
                             res.json(errObj);
                         } else if(result3){
                             result3.status="success";
 
                             var merged_object = JSON.parse((JSON.stringify(result2) +
                             JSON.stringify(result3)).replace(/}{/g,","));
-
+                        
                             res.json(merged_object);
 
                         } else {
@@ -369,7 +374,7 @@ app.post('/login', function (req, res) {
                         }
                         db.close();
                     });
-
+                   // res.json(JSON.parse(JSON.stringify(result2)));
                 } else{
                     res.json(pwdErrObj);
                 }
