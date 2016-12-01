@@ -26,6 +26,7 @@ var url = 'mongodb://localhost:27017/CS5200';
 
 //DB Functions
 function getNextSequence(name) {
+    console.log("Inside getNextSequence");
     var ret = db.counters.findAndModify(
         {
             query: { _id: name },
@@ -55,7 +56,6 @@ function getPersonId(email) {
 
 function insertPerson (db, callback) {
     db.collection('Person').insertOne({
-        "_id": getNextSequence("personid"),
         "first_name": fname,
         "last_name": lname,
         "email": email,
@@ -76,10 +76,10 @@ function insertPerson (db, callback) {
 
 
 function insertPref (db, callback)  {
-    db.collection('User').insertOne({
-        "_id": getPersonId(email),
+    db.collection('Users').insertOne({
+        "email": email,
         "preference": preferences
-
+    
     }, function(err, dbresult) {
         callback(err,dbresult);
     });
@@ -107,11 +107,11 @@ function findAllUser (db, callback) {
 }
 
 function findUserPreference (db, callback) {
-    console.log("In find user preference");
+    
     var cursor =db.collection('Users').find({
         "email": email
     } );
-    console.log(cursor);
+    
     cursor.next(function(err, doc) {
         callback(err,doc);
     });
@@ -141,7 +141,7 @@ function updateDetail (db, callback) {
 function updatePreference (db, callback) {
     db.collection('Users').updateOne(
 
-        { "_id" : id },
+        { "email" : email },
         {
             $set: { "preference": preferences }
         }, function(err, dbresult) {
@@ -159,7 +159,7 @@ function deleteUser (db, callback) {
 
 function deletePreference (db, callback) {
     db.collection('Users').deleteMany(
-        { "_id": id },
+        { "email": email },
         function(err, dbresult) {
             callback(err,dbresult);
         });
@@ -169,8 +169,16 @@ function deletePreference (db, callback) {
 ///////////////////////////////////////////////////
 
 function insertEvent(db, callback) {
+    var currentdate = new Date(); 
+    var datetime = currentdate.getDate() + ""
+                + (currentdate.getMonth()+1)  + "" 
+                + currentdate.getFullYear() + ""  
+                + currentdate.getHours() + ""  
+                + currentdate.getMinutes() + "" 
+                + currentdate.getSeconds();
+    console.log(datetime);
     db.collection('Events').insertOne({
-        "_id": getNextSequence("eventid"),
+        "_id": datetime,
         "name": name,
         "description": desc,
         "date": date,
@@ -349,7 +357,7 @@ app.post('/login', function (req, res) {
 
             if(err){
                 res.json(errObj);
-				console.log(errObj);
+				
             }
             else if(result2){
                 
@@ -359,7 +367,6 @@ app.post('/login', function (req, res) {
                     findUserPreference(db, function(err,result3) {
 
                         if(err){
-                            console.log("In find prefernce error");
                             res.json(errObj);
                         } else if(result3){
                             result3.status="success";
@@ -450,6 +457,7 @@ app.post('/updateuser', function (req, res) {
     city=req.body.cty;
     state=req.body.ste;
     zip=req.body.zp;
+    isadmin=req.body.isadmin;
     isenable=req.body.isenable;
 
 
@@ -488,7 +496,6 @@ app.post('/updatepref', function (req, res) {
     var errObj = { status: "error", message: "Could not update, user not found" };
     var updErrObj = { status: "error", message: "Could not update, other issue" };
 
-    id=req.body.id;
     email=req.body.email;
     preferences=req.body.pref;
 
@@ -503,39 +510,10 @@ app.post('/updatepref', function (req, res) {
                     res.json(errObj);
                 }
                 else if(result2){
-                    if(result2.result.nModified==1){
-                        findUser(db, function(err,result2) {
+                    res.json(succObj);
 
-                            if(err){
-                                res.json(errObj);
-                            }  else if(result2){
-                                result2.status="success";
-
-                                findUserPreference(db, function(err,result3) {
-
-                                    if(err){
-                                        res.json(errObj);
-                                    } else if(result3){
-                                        result3.status="success";
-
-                                        var merged_object = JSON.parse((JSON.stringify(result2) +
-                                        JSON.stringify(result3)).replace(/}{/g,","));
-
-                                        res.json(merged_object);
-
-                                    } else {
-                                        res.json(errObj);
-                                    }
-                                });
-                            } else {
-
-                                res.json(errObj);
-                            }
-                        });
-                    } else {
-                        res.json(errObj);
-                    }
-                } else{
+                }
+                else{
 
                     res.json(updErrObj);
                 }
@@ -631,14 +609,14 @@ app.post('/addevent', function (req, res) {
     desc=req.body.desc;
     date=req.body.date;
     time=req.body.time;
-    tickets = req.body.tickets;
+    tickets = 'https://www.google.com';
     adl1=req.body.adl1;
     adl2=req.body.adl2;
     city=req.body.cty;
     state=req.body.ste;
     zip=req.body.zp;
-    lat=req.body.lat;
-    lon=req.body.lon;
+    lat=0;
+    lon=0;
 
 
     MongoClient.connect(url, function(err, db) {
@@ -646,9 +624,11 @@ app.post('/addevent', function (req, res) {
 
         insertEvent(db, function(err,result2) {
             if(err){
+                console.log("Error: " + err);
                 res.json(errObj);
             }
             else if(result2){
+                console.log("Result: " + result2);
                 if(result2.result.n==1){
                     res.json(succObj);
                 }

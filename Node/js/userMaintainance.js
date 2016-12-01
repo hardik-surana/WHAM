@@ -37,8 +37,9 @@ function login() {
 function register() {
     var firstname = $("#firstName").val();
     var lastname = $("#lastName").val();
-    var username = $("#email").val();
-    var address = $("#address").val();
+    var email = $("#email").val();
+    var address1 = $("#addressLine1").val();
+    var address2 = $("#addressLine2").val();
     var city = $("#city").val();
     var state = $("#state").val();
     var zipcode = $("#zipcode").val();
@@ -48,13 +49,13 @@ function register() {
 
     //console.log(prefs);
 
-    var root = 'http://localhost:3000/newuser';
-    var root2 = 'http://localhost:3000/newpref';
+    var root = 'http://localhost:3000/addperson';
+    var root2 = 'http://localhost:3000/addpref';
 
     $.ajax({
         url: root,
         method: 'POST',
-        data: { us: username, pw: password, fn: firstname, ln: lastname, adl1: address, adl2: address, cty: city, ste: state, zp: zipcode, ph: phone  }
+        data: { email: email, pw: password, fn: firstname, ln: lastname, adl1: address1, adl2: address2, cty: city, ste: state, zp: zipcode, ph: phone  }
     }).then(function (data) {
         //console.log(data);
         if (data.status == "error") {
@@ -66,13 +67,14 @@ function register() {
     $.ajax({
         url: root2,
         method: 'POST',
-        data: { us: username, pref: prefs }
+        data: { email: email, pref: prefs }
     }).then(function (data) {
         //console.log(data);
         if (data.status == "error") {
             $("#regForm").append("<div class='alert alert-danger' role='alert'><strong>Error:</strong> " + data.message + "</div>");
         }
         else if (data.status == "success") {
+
             window.location.replace("\login.html");
 
         }
@@ -91,7 +93,16 @@ function checkUserLogin() {
         $("#registerNav").hide();
         $("#loginNav").hide();
         $("#logoutNav").show();
-        //$('#admin').show();
+        $('#addEvents').show();
+        console.log(userData);
+        if(userData.is_admin === 1){
+            $('#manageUsers').show();
+            $('#manageEvents').show();
+        }
+        else{
+            $('#manageUsers').hide();
+            $('#manageEvents').hide();
+        }
         $("#myaccount").show();
         $("#userName").append("<a><span class='glyphicon glyphicon-user'></span> Hi! " + userData.last_name + ", " + userData.first_name + "</a>");
         $("#jumbo").attr("class", "container-fluid");
@@ -105,10 +116,11 @@ function checkUserLogin() {
         }
     }
     else {
-        //$('#manageUsers').hide();
-        //$('#manageEvents').hide();
+        $('#manageUsers').hide();
+        $('#addEvents').hide();
+        $('#manageEvents').hide();
         $("#logoutNav").hide();
-        //$("#myaccount").hide();
+        $("#myaccount").hide();
     }
 }
 
@@ -145,16 +157,56 @@ function displayUsers(){
 function displayUnapprovedEvents(){
      
 }
+
+function addEvent(){
+    var eventName = $("#addEvent_name").val();
+    var eventDesc = $("#addEvent_description").val();
+    var eventAdd1 = $("#addEvent_add1").val();
+    var eventAdd2 = $("#addEvent_add2").val();
+    var eventCity = $("#addEvent_city").val();
+    var eventState = $("#addEvent_state").val();
+    var eventZip = $("#addEvent_zipcode").val();
+    var eventDate = $("#addEvent_date").val().split(' ')[0];
+    var eventTime = $("#addEvent_date").val().split(' ')[1] + " " + $("#addEvent_date").val().split(' ')[2];
+    
+    var url = 'http://localhost:3000/addevent';
+    
+
+    $.ajax({
+        url: url,
+        method: 'POST',
+        data: { name: eventName, desc: eventDesc, date: eventDate, time: eventTime, tickets:'No tickets', adl1: eventAdd1, adl2: eventAdd2, cty: eventCity, ste: eventState, zp: eventZip }
+    }).then(function (data) {
+        
+        if (data.status == "error") {
+            $("#regForm").append("<div class='alert alert-danger' role='alert'><strong>Error:</strong> " + data.message + "</div>");
+        }
+        else{
+            $('#bannerformmodalevents').modal('toggle');
+            $("#addEvent_name").val('');
+        $("#addEvent_description").val('');
+        $("#addEvent_add1").val('');
+    $("#addEvent_add2").val('');
+    $("#addEvent_city").val('');
+    $("#addEvent_state").val('');
+    $("#addEvent_zipcode").val('');
+    $("#addEvent_date").val('');
+        }
+        
+    });
+
+}
 function display_details() {
 
     var userData = JSON.parse(sessionStorage.getItem('userDetail'));
     $("#myacc_first_name").attr("value", userData.first_name);
     $("#myacc_last_name").attr("value", userData.last_name);
-    $("#myacc_email").attr("value", userData.username);
-    $("#myacc_address").attr("value", userData.address_line1);
+    $("#myacc_email").attr("value", userData.email);
+    $("#myacc_address1").attr("value", userData.address_line1);
+    $("#myacc_address2").attr("value", userData.address_line2);
     $("#myacc_city").attr("value", userData.city);
     $("#myacc_state").attr("value", userData.state);
-    $("#myacc_zipcode").attr("value", userData.zip);
+    $("#myacc_zipcode").attr("value", userData.zipcode);
     $("#myacc_phone").attr("value", userData.phone);
     var prefList = userData.preference;
     //console.log(prefList);
@@ -183,14 +235,14 @@ function updateProfile() {
             pass = $("#myacc_newpassword").val()
         }
 
-        //console.log(pass);
+        console.log(pass);
 
         $.ajax({
             url: root,
             method: 'POST',
-            data: { us: $("#myacc_email").val(), pw: pass, fn: $("#myacc_first_name").val(), ln: $("#myacc_last_name").val(), adl1: $("#myacc_address").val(), adl2: $("#myacc_address").val(), cty: $("#myacc_city").val(), ste: $("#myacc_state").val(), zp: $("#myacc_zipcode").val(), ph: $("#myacc_phone").val() }
+            data: { email: $("#myacc_email").val(), pw: pass, fn: $("#myacc_first_name").val(), ln: $("#myacc_last_name").val(), adl1: $("#myacc_address1").val(), adl2: $("#myacc_address2").val(), cty: $("#myacc_city").val(), ste: $("#myacc_state").val(), zp: $("#myacc_zipcode").val(), ph: $("#myacc_phone").val(), "isadmin" : userData.is_admin, "isenable" : userData.is_enable }
         }).then(function (data) {
-            //console.log(data);
+            console.log(data);
             if (data.status == "error") {
                 $("#requestacallform").append("<div class='alert alert-danger' role='alert'><strong>Error:</strong> " + data.message + "</div>");
             }
@@ -198,9 +250,9 @@ function updateProfile() {
         $.ajax({
             url: root2,
             method: 'POST',
-            data: { us: $("#myacc_email").val(), pref: $("#prefs").val() }
+            data: { email: $("#myacc_email").val(), pref: $("#prefs").val() }
         }).then(function (data) {
-            //console.log(data);
+            console.log(data);
             if (data.status == "error") {
                 //$("#requestacallform").append("<div class='alert alert-danger' role='alert'><strong>Error:</strong> " + data.message + "</div>");
             }
@@ -215,6 +267,7 @@ function updateProfile() {
             method: 'POST',
             data: { email: $("#myacc_email").val(), pwd: pass }
         }).then(function (data) {
+            console.log(data);
             if (data.status == "error") {
                 $("#login").append("<div class='alert alert-danger' role='alert'><strong>Error:</strong> " + data.message + "</div>");
             }

@@ -45,7 +45,7 @@ db.Person.insert({
 "_id": 99999998,
 "first_name": "Sudhanshu",
 "last_name": "Joshi",
-"email": "sudjoshi,
+"email": "sudjoshi",
 "phone": 1234567890,
 "password": "qwerty",
 "address_line1": "123 Abc Ave",
@@ -56,6 +56,12 @@ db.Person.insert({
 "is_admin": 1,
 "is_enable": 1
 })
+
+db.Users.insert({
+"_id": 99999998,
+"preference": ["Music", "Food", "Art"]})
+
+db.Users.insert({ "email": "sudjoshi", "preference": ["Music", "Food", "Art"]})
 
 Running the server:
 Navigate to Node folder
