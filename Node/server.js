@@ -191,6 +191,7 @@ function insertEvent(db, callback) {
         "zipcode": zip,
         "latitute": lat,
         "longitude": lon,
+        "category": cat,
         "is_approved": 0
 
     }, function (err, dbresult) {
@@ -200,7 +201,18 @@ function insertEvent(db, callback) {
 
 function findEvent (db, callback) {
     var cursor =db.collection('Events').find({
-        "city": city
+        "city": city,
+        "category": cat
+    } );
+
+    cursor.next(function(err, doc) {
+        callback(err,doc);
+    });
+}
+
+function eventDetails (db, callback) {
+    var cursor =db.collection('Events').find({
+        "_id": id
     } );
 
     cursor.next(function(err, doc) {
@@ -209,7 +221,9 @@ function findEvent (db, callback) {
 }
 
 function findAllEvents(db, callback) {
-    var cursor =db.collection('Events').find();
+    var cursor =db.collection('Events').find({
+        "is_approved": 0
+    });
 
     cursor.next(function(err, doc) {
         callback(err,doc);
@@ -604,44 +618,49 @@ app.post('/addevent', function (req, res) {
     var errObj = { status: "error", message: "Could not insert, Dup found" };
     var inserErrObj = { status: "error", message: "Could not insert, other issue" };
 
-
-    name=req.body.name;
-    desc=req.body.desc;
-    date=req.body.date;
-    time=req.body.time;
-    tickets = 'https://www.google.com';
-    adl1=req.body.adl1;
-    adl2=req.body.adl2;
-    city=req.body.cty;
-    state=req.body.ste;
-    zip=req.body.zp;
-    lat=0;
-    lon=0;
+    catlist=req.body.catlist;
 
 
     MongoClient.connect(url, function(err, db) {
         assert.equal(null, err);
 
-        insertEvent(db, function(err,result2) {
-            if(err){
-                console.log("Error: " + err);
-                res.json(errObj);
-            }
-            else if(result2){
-                console.log("Result: " + result2);
-                if(result2.result.n==1){
-                    res.json(succObj);
-                }
-                else{
-                    res.json(inserErrObj);
-                }
-            }
-            else{
+        for (cat1 in catlist) {
 
-                res.json(errObj);
-            }
-            db.close();
-        });
+            name=req.body.name;
+            desc=req.body.desc;
+            date=req.body.date;
+            time=req.body.time;
+            tickets = 'https://www.google.com';
+            adl1=req.body.adl1;
+            adl2=req.body.adl2;
+            city=req.body.cty;
+            state=req.body.ste;
+            zip=req.body.zp;
+            lat=0;
+            lon=0;
+            cat=cat1;
+
+            insertEvent(db, function (err, result2) {
+                if (err) {
+                    console.log("Error: " + err);
+                    res.json(errObj);
+                }
+                else if (result2) {
+                    console.log("Result: " + result2);
+                    if (result2.result.n == 1) {
+                        res.json(succObj);
+                    }
+                    else {
+                        res.json(inserErrObj);
+                    }
+                }
+                else {
+
+                    res.json(errObj);
+                }
+                db.close();
+            });
+        }
     });
 
 });
@@ -651,19 +670,47 @@ app.post('/findevents', function (req, res) {
     //Sample: http://localhost:3000/findevents?city=boston
 
     var errObj = { status: "error", message: "Username Not Found" };
+    var merged_object;
 
-    city=req.body.city;
+    catlist=req.body.catlist;
+
+    MongoClient.connect(url, function(err, db) {
+        assert.equal(null, err);
+        for (cat1 in catlist) {
+            city = req.body.city;
+            cat = cat1;
+            findEvent(db, function (err, result2) {
+
+                if (err) {
+                    res.json(errObj);
+                } else if (result2) {
+                    result2.status = "success";
+                    merged_object += JSON.parse((JSON.stringify(result2)).replace(/}{/g,","));
+                } else {
+                    res.json(errObj);
+                }
+            });
+        }
+        res.json(merged_object);
+    });
+});
+
+app.post('/eventdetails', function (req, res) {
+    //Sample: http://localhost:3000/eventdetails
+
+    var errObj = { status: "error", message: "Event Not Found" };
+
+    id=req.body.id;
 
     MongoClient.connect(url, function(err, db) {
         assert.equal(null, err);
 
-        findEvent(db, function(err,result2) {
+        eventDetails(db, function(err,result2) {
 
             if(err){
                 res.json(errObj);
             } else if(result2){
                 result2.status="success";
-                res.json(result2);
             } else{
                 res.json(errObj);
             }
