@@ -200,11 +200,12 @@ function insertEvent(db, callback) {
 }
 
 function findEvent (db, callback) {
+    console.log('Inside find events' + ':'+city +':' +cat);
     var cursor =db.collection('Events').find({
         "city": city,
         "category": cat
     } );
-
+    console.log('Success');
     cursor.next(function(err, doc) {
         callback(err,doc);
     });
@@ -638,7 +639,7 @@ app.post('/addevent', function (req, res) {
             zip=req.body.zp;
             lat=0;
             lon=0;
-            cat=cat1;
+            cat=catlist[cat1];
 
             insertEvent(db, function (err, result2) {
                 if (err) {
@@ -658,7 +659,7 @@ app.post('/addevent', function (req, res) {
 
                     res.json(errObj);
                 }
-                db.close();
+                
             });
         }
     });
@@ -673,17 +674,20 @@ app.post('/findevents', function (req, res) {
     var merged_object;
 
     catlist=req.body.catlist;
-
+    console.log(catlist);
     MongoClient.connect(url, function(err, db) {
         assert.equal(null, err);
         for (cat1 in catlist) {
+            
             city = req.body.city;
-            cat = cat1;
+            cat = catlist[cat1];
+            console.log(cat);
             findEvent(db, function (err, result2) {
-
                 if (err) {
+                    console.log(err)
                     res.json(errObj);
                 } else if (result2) {
+                    
                     result2.status = "success";
                     merged_object += JSON.parse((JSON.stringify(result2)).replace(/}{/g,","));
                 } else {

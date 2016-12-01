@@ -236,9 +236,23 @@
                                                 </div>
                                                 <div class="form-group">
                                                     <div class="input-group">
-                                                        <span class="input-group-addon"><i class="fa fa-user"></i>Event Description</span>
+                                                        <span class="input-group-addon"><i class="fa fa-user"></i>Event Description:</span>
                                                         <input id="addEvent_description" type="text" class="form-control" value="" name="last_name" />
                                                     </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="prefs" class="control-label">Category:</label>
+                                                    <select class="selectpicker show-tick" data-width="100%" id="category" multiple data-max-options="5" required>
+                                                        <option id="art" value="art">Art</option>
+                                                        <option id="books" value="books">Books</option>
+                                                        <option id="comedy" value="comedy">Comedy</option>
+                                                        <option id="food" value="food">Food</option>
+                                                        <option id="music" value="music">Music</option>
+                                                        <option id="sales" value="sales">Sales</option>
+                                                        <option id="science" value="science">Science</option>
+                                                        <option id="sports" value="sports">Sports</option>
+                                                        <option id="technology" value="technology">Technology</option>
+                                                    </select>
                                                 </div>
                                                 <div class="form-group">
                                                     <div class="input-group">
@@ -388,8 +402,14 @@
                 <div class="row">
                     <div class="col-md-10">
                         <div class="row">
-                            <label for="search">Search:</label>
-                            <input type="text" class="form-control" id="search" placeholder="Enter keywords to search event">
+                            <label for="City">Select City:</label>
+                                <select class="form-control" id="searchByCity">
+                                    <option>Boston</option>
+                                    <option>New York</option>
+                                    <option>Los Angeles</option>
+                                    <option>San Fransisco</option>
+                                    <option>Austin</option>
+                                </select>
                         </div>
                     </div>
                     <div class="col-md-5">

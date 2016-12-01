@@ -14,45 +14,48 @@ var markersarray = [];
 	function getEvents()
 	{
 		
-	    var keyword = $("#search").val();
-	    var fromdate = $("#fromdate").val().split("/");
-	    var todate = $("#todate").val();
-	    var distance = $("#slideBar").val();
+	    var city = $("#searchByCity").val();
 	    clearMarkers();
-	    if (keyword == "" && fromdate == "" && todate == "")
+	    if (city != "")
 	    {
 	        $.ajax({
 	            //url: "http://api.eventful.com/jsonp/events/search?...&location=Boston&within=5&date=Future&app_key=kk7Jzr3BP47vLZH6",
-	            url: "http://api.eventful.com/jsonp/events/search?...&where="+mylat+","+mylong+"&within="+distance+"&page_size=30&date=Next week&app_key=kk7Jzr3BP47vLZH6",
+	            url: "http://api.eventful.com/jsonp/events/search?...&location="+city+"&within=10&page_size=30&date=Future&app_key=kk7Jzr3BP47vLZH6",
 	            dataType: "jsonp",
 	            success: renderEvents
 	        })
 	    }
-	    else if (fromdate == "" || todate == "")
-	    {
-	        $.ajax({
-	            
-	            url: "http://api.eventful.com/jsonp/events/search?...&keywords=" + keyword +
-					 "&where=" + mylat + "," + mylong + "&within=" + distance + "&page_size=30&app_key=kk7Jzr3BP47vLZH6",
-	            dataType: "jsonp",
-	            success: renderEvents
-	        })
-
-	    }
-	    else {
-	        $.ajax({
-
-	            url: "http://api.eventful.com/jsonp/events/search?...&keywords=" + keyword +
-					 "&where=" + mylat + "," + mylong + "&within=" + distance + "&date=" + fromdate[2].split(" ")[0] + fromdate[0] + fromdate[1] + "00-" + todate[2].split(" ")[0] + todate[0] + todate[1] + "00&page_size=30&app_key=kk7Jzr3BP47vLZH6",
-	            dataType: "jsonp",
-	            success: renderEvents
-	        })
-	    }
+		else{
+			//Display error here
+		}
 			
 		}
 
-function insertEvents(respose){
-	
+function getEventsDb(){
+	var userData = JSON.parse(sessionStorage.getItem('userDetail'));
+	console.log(userData.preference);
+	var city = $("#searchByCity").val();
+	if (city != "")
+	    {
+	        $.ajax({
+        url: 'http://localhost:3000/findevents',
+        method: 'POST',
+        data: { city:city, catlist: userData.preference }
+    }).then(function (data) {
+
+        if (data.status == "error") {
+            console.log(data.status)
+        }
+        else {
+            console.log(data);
+        }
+
+    });
+	    }
+		else{
+			//Display error here
+		}
+
 }
 
 		function renderEvents(response)
