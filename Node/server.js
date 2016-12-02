@@ -170,11 +170,41 @@ function insertEvent(db, callback) {
     });
 }
 
+function addHost (db, callback) {
+    var currentdate = new Date();
+    var datetime = currentdate.getDate() + ""
+        + (currentdate.getMonth()+1)  + ""
+        + currentdate.getFullYear() + ""
+        + currentdate.getHours() + ""
+        + currentdate.getMinutes() + ""
+        + currentdate.getSeconds();
+    db.collection('Events').insertOne({
+        "_id": datetime,
+        "name": name,
+        "description": desc,
+        "date": date,
+        "time": time,
+        "tickets": tickets,
+        "address_line1": adl1,
+        "address_line2": adl2,
+        "city": city,
+        "state": state,
+        "zipcode": zip,
+        "latitute": lat,
+        "longitude": lon,
+        "category": catlist,
+        "is_approved": 0
+
+    }, function (err, dbresult) {
+        callback(err, dbresult);
+    });
+}
+
 function findEvent (db, callback) {
     var cursor =db.collection('Events').find({
         "city": city,
         "category": { $in: catlist }
-    } );
+    }).toArray();
     cursor.next(function(err, doc) {
         callback(err,doc);
     });
@@ -193,7 +223,7 @@ function eventDetails (db, callback) {
 function findAllEvents(db, callback) {
     var cursor =db.collection('Events').find({
         "is_approved": 0
-    });
+    }).toArray();
 
     cursor.next(function(err, doc) {
         callback(err,doc);
@@ -385,16 +415,17 @@ app.post('/findallusers', function (req, res) {
     MongoClient.connect(url, function(err, db) {
         assert.equal(null, err);
 
-        findAllUser(db, function(err,result2) {
+        city = req.body.city;
+        catlist=req.body.catlist;
 
-            if(err){
-                res.json(errObj);
-            } else if(result2){
-                result2.status="success";
-                res.json(JSON.parse((JSON.stringify(result2).replace(/}{/g,","))));
-            } else{
-                res.json(errObj);
-            }
+        db.collection('Events', function(err, collection) {
+            collection.find({
+                "city": city,
+                "category": { $in: catlist}
+            }).toArray(function(err, items) {
+                console.log(items);
+                res.json(items);
+            });
         });
     });
 });
@@ -640,17 +671,15 @@ app.post('/findevents', function (req, res) {
 
         city = req.body.city;
         catlist=req.body.catlist;
-        findEvent(db, function (err, result2) {
-            if (err) {
-                console.log(err);
-                res.json(errObj);
-            } else if (result2) {
 
-                result2.status = "success";
-                res.json(JSON.parse((JSON.stringify(result2).replace(/}{/g,","))));
-            } else {
-                res.json(errObj);
-            }
+        db.collection('Events', function(err, collection) {
+            collection.find({
+                "city": city,
+                "category": { $in: catlist}
+            }).toArray(function(err, items) {
+                console.log(items);
+                res.json(items);
+            });
         });
     });
 });
@@ -693,7 +722,8 @@ app.post('/findallevents', function (req, res) {
                 res.json(errObj);
             } else if(result2){
                 result2.status="success";
-                res.json(JSON.parse((JSON.stringify(result2).replace(/}{/g,","))));
+                console.log(result2);
+                res.json(result2);
             } else{
                 res.json(errObj);
             }
