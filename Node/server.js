@@ -161,7 +161,7 @@ function eventDetails (db, callback) {
     var cursor =db.collection('Events').find({
         "_id": id
     } );
-
+    console.log('In query');
     cursor.next(function(err, doc) {
         callback(err,doc);
     });
@@ -372,7 +372,7 @@ app.post('/findallusers', function (req, res) {
             collection.find().toArray(function(err, items) {
                 res.json(items);
             });
-            db.close();
+            
         });
     });
 });
@@ -586,35 +586,19 @@ app.post('/addevent', function (req, res) {
         email=req.body.email;
 
         insertEvent(db, function (err, result2) {
-            if (err) {
-                console.log("Error: " + err);
-                res.json(errObj);
-            }
-            else if (result2) {
-                if (result2.result.n == 1) {
-                    addHost(db, function(err,result3) {
-                        if(err){
-                            res.json(errObj);
-                        } else if(result3){
-                            if(result3.result.n==1){
-                                res.json(succObj);
-                            }
-                            else{
-                                res.json(inserErrObj);
-                            }
-                        } else{
-                            res.json(errObj);
-                        }
-                    });
-                } else {
-                    res.json(inserErrObj);
-                }
+            if (result2.result.n ==  1) {
+                addHost (db, function(err, result3){
+                    if (result3.result.n ==  1) {
+                        res.json(succObj);                            
+                    } else {
+                       res.json(errObj);
+                    }
+                });
             } else {
-
                 res.json(errObj);
             }
-            db.close();
         });
+        db.close;
     });
 });
 
@@ -627,17 +611,17 @@ app.post('/findevents', function (req, res) {
 
         city = req.body.city;
         catlist=req.body.catlist;
-
+        
         db.collection('Events', function(err, collection) {
             collection.find({
+                "is_approved": 1,
                 "city": city,
                 "category": { $in: catlist}
             }).toArray(function(err, items) {
-                console.log(items);
                 res.json(items);
             });
-            db.close();
         });
+        
     });
 });
 
@@ -647,7 +631,7 @@ app.post('/eventdetails', function (req, res) {
     var errObj = { status: "error", message: "Event Not Found" };
 
     id=req.body.id;
-
+    console.log(id);
     MongoClient.connect(url, function(err, db) {
         assert.equal(null, err);
 
@@ -681,7 +665,7 @@ app.post('/findallevents', function (req, res) {
             }).toArray(function(err, items) {
                 res.json(items);
             });
-            db.close();
+            
         });
     });
 });

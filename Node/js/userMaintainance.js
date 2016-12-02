@@ -20,7 +20,7 @@ function login() {
         method: 'POST',
         data: { email: emailid, pwd: password }
     }).then(function (data) {
-        console.log(data);
+        //console.log(data);
         if (data.status == "error") {
             $("#login").append("<div class='alert alert-danger' role='alert'><strong>Error:</strong> " + data.message + "</div>");
         }
@@ -125,6 +125,46 @@ function checkUserLogin() {
     }
 }
 
+function checkLogin() {
+
+    if (sessionStorage.getItem('loginStatus') == 'true' && localStorage.getItem('session') == 'true') {
+
+        var userData = JSON.parse(sessionStorage.getItem('userDetail'));
+        //console.log(userData);
+        $("#registerNav").hide();
+        $("#loginNav").hide();
+        $("#logoutNav").show();
+        $('#addEvents').show();
+        
+        if (userData.is_admin === 1) {
+            $('#manageUsers').show();
+            $('#manageEvents').show();
+        }
+        else {
+            $('#manageUsers').hide();
+            $('#manageEvents').hide();
+        }
+        $("#myaccount").show();
+        $("#userName").append("<a><span class='glyphicon glyphicon-user'></span> Hi! " + userData.last_name + ", " + userData.first_name + "</a>");
+        $("#jumbo").attr("class", "container-fluid");
+        $("#jumbo h1").text("Displaying events for:");
+
+        for (i = 0; i < userData.preference.length; i++) {
+            var checkbox = "<div class='col-md-2'><div class='input-group'><span class='input-group-addon'><input type='checkbox' id='checkbox" + i + "' value='" + userData.preference[i] + "' onclick='checkBox_event()' checked></span><input type='text' class='form-control' value='" + (userData.preference[i]).toUpperCase() + "' readonly></div></div>"
+            $("#checkrow").append(checkbox);
+            
+        }
+    }
+    else {
+        
+        $('#manageUsers').hide();
+        $('#addEvents').hide();
+        $('#manageEvents').hide();
+        $("#logoutNav").hide();
+        $("#myaccount").hide();
+    }
+}
+
 function addPref() {
 
     var prefdiv = $("#prefDiv");
@@ -152,7 +192,25 @@ function prefChange() {
 
 };
 function displayUsers() {
-
+    $.ajax({
+						url: 'http://localhost:3000/findallusers',
+						method: 'POST',
+					}).then(function (data) {
+                        var tbody = $("#userTable"); 
+                        tbody.find("tr:gt(0)").remove();
+                        for(var i in data){
+                            var tr = $("<tr>");
+                            var object = data[i];
+                            var firstName = object.first_name;
+                            var lastName = object.last_name;
+                            var address = object.address_line1 + ',' + object.address_line2 + ',' + object.city + ',' + object.state + ',' +object.zipcode;
+                            var email = object.email;
+                            
+                            
+                            tr.append(titleTd);
+                            tr.append(titledesc);
+                        }
+                    });
 }
 
 function displayUnapprovedEvents() {
@@ -160,6 +218,8 @@ function displayUnapprovedEvents() {
 }
 
 function addEvent() {
+    var userData = JSON.parse(sessionStorage.getItem('userDetail'));
+    var email = userData.email;
     var eventName = $("#addEvent_name").val();
     var eventDesc = $("#addEvent_description").val();
     var eventAdd1 = $("#addEvent_add1").val();
@@ -176,9 +236,9 @@ function addEvent() {
     $.ajax({
         url: url,
         method: 'POST',
-        data: { name: eventName, desc: eventDesc, date: eventDate, time: eventTime, tickets: 'No tickets', adl1: eventAdd1, adl2: eventAdd2, cty: eventCity, ste: eventState, zp: eventZip, catlist: eventCategory }
+        data: { email: email, name: eventName, desc: eventDesc, date: eventDate, time: eventTime, tickets: 'No tickets', adl1: eventAdd1, adl2: eventAdd2, cty: eventCity, ste: eventState, zp: eventZip, catlist: eventCategory }
     }).then(function (data) {
-
+        console.log(data);
         if (data.status == "error") {
             $("#regForm").append("<div class='alert alert-danger' role='alert'><strong>Error:</strong> " + data.message + "</div>");
         }
@@ -234,14 +294,14 @@ function updateProfile() {
         pass = $("#myacc_newpassword").val()
     }
 
-    console.log(pass);
+    //console.log(pass);
 
     $.ajax({
         url: root,
         method: 'POST',
         data: { email: $("#myacc_email").val(), pw: pass, fn: $("#myacc_first_name").val(), ln: $("#myacc_last_name").val(), adl1: $("#myacc_address1").val(), adl2: $("#myacc_address2").val(), cty: $("#myacc_city").val(), ste: $("#myacc_state").val(), zp: $("#myacc_zipcode").val(), ph: $("#myacc_phone").val(), "isadmin": userData.is_admin, "isenable": userData.is_enable }
     }).then(function (data) {
-        console.log(data);
+        //console.log(data);
         if (data.status == "error") {
             $("#requestacallform").append("<div class='alert alert-danger' role='alert'><strong>Error:</strong> " + data.message + "</div>");
         }
@@ -251,7 +311,7 @@ function updateProfile() {
         method: 'POST',
         data: { email: $("#myacc_email").val(), pref: $("#prefs").val() }
     }).then(function (data) {
-        console.log(data);
+        //console.log(data);
         if (data.status == "error") {
             //$("#requestacallform").append("<div class='alert alert-danger' role='alert'><strong>Error:</strong> " + data.message + "</div>");
         }
@@ -266,7 +326,7 @@ function updateProfile() {
         method: 'POST',
         data: { email: $("#myacc_email").val(), pwd: pass }
     }).then(function (data) {
-        console.log(data);
+        //console.log(data);
         if (data.status == "error") {
             $("#login").append("<div class='alert alert-danger' role='alert'><strong>Error:</strong> " + data.message + "</div>");
         }

@@ -269,7 +269,13 @@
                                                 <div class="form-group">
                                                     <div class="input-group modal-sm">
                                                         <span class="input-group-addon"><i class="fa fa-phone"></i>City:</span>
-                                                        <input id="addEvent_city" type="text" class="form-control" value="" name="city" />
+                                                            <select class="form-control" id="addEvent_city">
+                                                                <option>Boston</option>
+                                                                <option>New York</option>
+                                                                <option>Los Angeles</option>
+                                                                <option>San Fransisco</option>
+                                                                <option>Austin</option>
+                                                            </select>
                                                     </div>
                                                 </div>
                                                 <div class="form-group">
@@ -339,7 +345,7 @@
                             </div>
                     </li>
                     <li id="manageUsers">
-                        <a href="#" data-toggle="modal" data-target="#bannerformmodal2" onclick="manageUsers()">Manage Users</a>
+                        <a href="#" data-toggle="modal" data-target="#bannerformmodal2" onclick="displayUsers()">Manage Users</a>
                         <div class="modal fade bannerformmodal" tabindex="-1" role="dialog" aria-labelledby="bannerformmodal2" aria-hidden="true"
                             id="bannerformmodal2">
                             <div class="modal-dialog">
@@ -352,7 +358,7 @@
                                             </div>
                                             <div class="modal-body">
                                                 <div class="table-responsive" id="eventApprovalTable">
-                                                    <table class="table table-hover">
+                                                    <table class="table table-hover" id="userTable">
                                                         <thead>
                                                             <tr>
                                                                 <th>#</th>

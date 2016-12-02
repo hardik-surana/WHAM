@@ -33,21 +33,57 @@ var markersarray = [];
 
 function getEventsDb(){
 	var userData = JSON.parse(sessionStorage.getItem('userDetail'));
-	console.log(userData.preference);
 	var city = $("#searchByCity").val();
 	if (city != "")
 	    {
-	        $.ajax({
+		$.ajax({
         url: 'http://localhost:3000/findevents',
         method: 'POST',
         data: { city:city, catlist: userData.preference }
     }).then(function (data) {
 
         if (data.status == "error") {
-            console.log(data.status)
+            //
         }
         else {
-            console.log(data);
+			var tbody = $("#tableBody");
+			tbody.empty();
+			$("#results").show();
+            for (var e in data)
+			{
+				
+				var object = data[e];
+				var title = object.name;
+				var latitude = Number(object.latitude);
+				var longitude = Number(object.longitude);
+				var eventfulUrl = object.tickets;
+				var eventid = object._id;
+				var venueaddress = object.address_line1 + ", " +object.address_line2+", " + object.city + ", " + object.state+ ", " +object.zipcode;
+				var date = object.date;
+				var time = object.time;
+				var description = object.description;
+
+				if (description == null || description == "") {
+
+				    description = "There is no description for this event";
+				}
+
+				if (title == null || title == "") {
+
+				    title = "There is no title for this event";
+				}
+
+				var tr = $("<tr>");
+			    //var titleLink = $("<a>").attr("href", eventfulUrl).append(title);
+				var titleLink = "<a href='eventDetails.html?eventid="+ eventid + "' target='_blank'>" + title + "</a>";
+				var titleTd = $("<td style='width:200px; font-size:15px'>").append(titleLink);
+				var titledesc = $("<td style='font-size:15px'>").append("Venue: " + event.venue_name + "</br> Address: " + venueaddress + "</br>Date: " + date+ "</br>Time: " + time);//(jQuery.trim(description).substring(0, 200).replace('<br>', '').split(" ").slice(0, -1).join(" ") + "...");
+				
+				tr.append(titleTd);
+				tr.append(titledesc);
+
+				tbody.append(tr).fadeIn();
+			}
         }
 
     });
@@ -63,7 +99,6 @@ function getEventsDb(){
 
 			var tbody = $("#tableBody"); 
 			var template = $("#template").clone();
-			tbody.empty();
 			var bounds = new google.maps.LatLngBounds();
 			var infoWindowContent = {};
 			var i = 1;
@@ -93,7 +128,7 @@ function getEventsDb(){
 
 				var tr = $("<tr>");
 			    //var titleLink = $("<a>").attr("href", eventfulUrl).append(title);
-				var titleLink = "<a href='eventDetails.html?eventid="+ eventid + "&location=" + mylat + "," + mylong + "' target='_blank'>" + title + "</a>";
+				var titleLink = "<a href='eventDetails.html?eventid="+ eventid + "' target='_blank'>" + title + "</a>";
 				var titleTd = $("<td style='width:200px; font-size:15px'>").append(titleLink);
 				var titledesc = $("<td style='font-size:15px'>").append("Venue: " + event.venue_name + "</br> Address: " + venueaddress + "</br>Date: " + date);//(jQuery.trim(description).substring(0, 200).replace('<br>', '').split(" ").slice(0, -1).join(" ") + "...");
 				
@@ -156,7 +191,46 @@ function getEventsDb(){
                  "&app_key=kk7Jzr3BP47vLZH6",
 	        dataType: "jsonp",
 	        success: function (response) {
-	            var title = response.title;
+				//console.log(response);
+				if(response.hasOwnProperty('status')){
+					//console.log('In else');
+					$.ajax({
+						url: 'http://localhost:3000/eventdetails',
+						method: 'POST',
+						data: { id:eventId }
+					}).then(function (data) {
+				var title = data.name;
+	            //console.log(title);
+				var description = data.description;
+	            var venue = data.address_line1 + ',' + data.address_line2 + ',' + data.city + ',' +data.state+ ',' +data.zipcode;
+	            var evwhen = data.date;
+	            var evtill = null;
+				var time = data.time;
+                 	
+	                
+	            $("#perfInfo").remove();
+	            var imgLink = "images/event.jpg";
+	            
+
+	            $("#title").append("<h3>" + title + "</h3>");
+	            
+	            $("#description").append("<p>" + description + "</p>");
+	            
+	            $("#venue").append("<p>" + venue + "</p>");
+	            $("#fromdate").append("<p>" + evwhen + "</p>");
+	            $("#todate").append("<p>" + time + "</p>");
+	            $("#performers").append("<p>" + performers + "</p>");
+	            
+	            $("#moreInfo").remove();
+
+            	$("#eventimage").append("<img src=\"" + imgLink + "\">");
+            	//getDirections(response.latitude, response.longitude);
+
+            	$(".fb-share-button").attr("data-href", url.split("&"));
+					});
+				}
+				else{
+				var title = response.title;
 	            var description = response.description;
 	            var venue = response.venue_name;
 	            var where = response.address + ", " + response.city + ", " + response.region;
@@ -217,7 +291,10 @@ function getEventsDb(){
             	getDirections(response.latitude, response.longitude);
 
             	$(".fb-share-button").attr("data-href", url.split("&"));
-	        }
+				}
+	            
+	        },
+			
 	    });
 	}
 	function getEventsWithPreferences(preferences) {
