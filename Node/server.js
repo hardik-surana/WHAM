@@ -103,6 +103,18 @@ function updateDetail (db, callback) {
         });
 }
 
+
+function updateaccess (db, callback) {
+    db.collection('Person').updateOne(
+
+        { "email" : email },
+        {
+            $set: { "is_enable": isenable }
+        }, function(err, dbresult) {
+            callback(err,dbresult);
+        });
+}
+
 function updatePreference (db, callback) {
     db.collection('Users').updateOne(
 
@@ -446,6 +458,32 @@ app.post('/updateuser', function (req, res) {
         res.redirect('/login.html');
     }
 
+});
+
+app.post('/updateaccess', function (req, res) {
+    //Sample: http://localhost:3000/updateaccess
+
+    var succObj = { status: "success" };
+    var errObj = { status: "error", message: "Could not update, user not found" };
+    var updErrObj = { status: "error", message: "Could not update, other issue" };
+
+    email=req.body.email;
+    isenable=req.body.isenable;
+
+    MongoClient.connect(url, function(err, db) {
+        assert.equal(null, err);
+
+        updateaccess(db, function(err,result2) {
+            if(err){
+                res.json(errObj);
+            } else if(result2){
+                res.json(succObj);
+            } else{
+                res.json(updErrObj);
+            }
+            db.close();
+        });
+    });
 });
 
 app.post('/updatepref', function (req, res) {
