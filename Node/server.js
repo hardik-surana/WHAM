@@ -372,7 +372,6 @@ app.post('/findallusers', function (req, res) {
             collection.find().toArray(function(err, items) {
                 res.json(items);
             });
-            
         });
     });
 });
@@ -598,7 +597,6 @@ app.post('/addevent', function (req, res) {
                 res.json(errObj);
             }
         });
-        db.close;
     });
 });
 
@@ -656,16 +654,12 @@ app.post('/findallevents', function (req, res) {
     MongoClient.connect(url, function(err, db) {
         assert.equal(null, err);
 
-        city = req.body.city;
-        catlist=req.body.catlist;
-
         db.collection('Events', function(err, collection) {
             collection.find({
                 "is_approved": 0
             }).toArray(function(err, items) {
                 res.json(items);
             });
-            
         });
     });
 });
@@ -744,7 +738,30 @@ app.post('/finduserevents', function (req, res) {
             }).toArray(function(err, items) {
                 res.json(items);
             });
-            db.close();
+        });
+    });
+});
+
+app.post('/finduserevents2', function (req, res) {
+    //Sample: http://localhost:3000/finduserevents
+
+    MongoClient.connect(url, function(err, db) {
+        assert.equal(null, err);
+
+        email = req.body.email;
+
+        var event_id = db.collection('Host').find({"user": email}).toArray();
+        var aux = event_id["0"];
+        var aux2 = aux.map(function (u) {
+            return u.event;
+        });
+
+        db.collection('Events', function(err, collection) {
+            collection.find({
+                "user": {"$in" : aux2}
+            }).toArray(function(err, items) {
+                res.json(items);
+            });
         });
     });
 });
