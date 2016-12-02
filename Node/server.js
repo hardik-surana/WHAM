@@ -70,13 +70,6 @@ function findUser (db, callback) {
     
 }
 
-function findAllUser (db, callback) {
-    var cursor =db.collection('Person').find();
-
-    cursor.next(function(err, doc) {
-        callback(err,doc);
-    });
-}
 
 function findUserPreference (db, callback) {
     
@@ -141,15 +134,9 @@ function deletePreference (db, callback) {
 ///////////////////////////////////////////////////
 
 function insertEvent(db, callback) {
-    var currentdate = new Date(); 
-    var datetime = currentdate.getDate() + ""
-                + (currentdate.getMonth()+1)  + "" 
-                + currentdate.getFullYear() + ""  
-                + currentdate.getHours() + ""  
-                + currentdate.getMinutes() + "" 
-                + currentdate.getSeconds();
+
     db.collection('Events').insertOne({
-        "_id": datetime,
+        "_id": id,
         "name": name,
         "description": desc,
         "date": date,
@@ -167,46 +154,6 @@ function insertEvent(db, callback) {
 
     }, function (err, dbresult) {
         callback(err, dbresult);
-    });
-}
-
-function addHost (db, callback) {
-    var currentdate = new Date();
-    var datetime = currentdate.getDate() + ""
-        + (currentdate.getMonth()+1)  + ""
-        + currentdate.getFullYear() + ""
-        + currentdate.getHours() + ""
-        + currentdate.getMinutes() + ""
-        + currentdate.getSeconds();
-    db.collection('Events').insertOne({
-        "_id": datetime,
-        "name": name,
-        "description": desc,
-        "date": date,
-        "time": time,
-        "tickets": tickets,
-        "address_line1": adl1,
-        "address_line2": adl2,
-        "city": city,
-        "state": state,
-        "zipcode": zip,
-        "latitute": lat,
-        "longitude": lon,
-        "category": catlist,
-        "is_approved": 0
-
-    }, function (err, dbresult) {
-        callback(err, dbresult);
-    });
-}
-
-function findEvent (db, callback) {
-    var cursor =db.collection('Events').find({
-        "city": city,
-        "category": { $in: catlist }
-    }).toArray();
-    cursor.next(function(err, doc) {
-        callback(err,doc);
     });
 }
 
@@ -220,22 +167,13 @@ function eventDetails (db, callback) {
     });
 }
 
-function findAllEvents(db, callback) {
-    var cursor =db.collection('Events').find({
-        "is_approved": 0
-    }).toArray();
-
-    cursor.next(function(err, doc) {
-        callback(err,doc);
-    });
-}
 
 function approveEvent (db, callback) {
     db.collection('Events').updateOne(
 
         { "_id" : id },
         {
-            $set: { "is_approved": isapproved}
+            $set: { "is_approved": 1}
         }, function(err, dbresult) {
             callback(err,dbresult);
         });
@@ -244,6 +182,28 @@ function approveEvent (db, callback) {
 function deleteEvent (db, callback) {
     db.collection('Events').deleteMany(
         { "_id": id },
+        function(err, dbresult) {
+            callback(err,dbresult);
+        });
+}
+
+///////////////////////////////////
+
+function addHost (db, callback) {
+
+    db.collection('Host').insertOne({
+        "user": email,
+        "event": id
+
+
+    }, function (err, dbresult) {
+        callback(err, dbresult);
+    });
+}
+
+function removeHost (db, callback) {
+    db.collection('Host').deleteMany(
+        { "event": id },
         function(err, dbresult) {
             callback(err,dbresult);
         });
@@ -372,12 +332,9 @@ app.post('/login', function (req, res) {
             if(err){
                 res.json(errObj);
 				
-            }
-            else if(result2){
-                
+            } else if (result2){
                 if(result2.password==pwd){
                     result2.status="success";
-
                     findUserPreference(db, function(err,result3) {
 
                         if(err){
@@ -395,12 +352,10 @@ app.post('/login', function (req, res) {
                         }
                         db.close();
                     });
-                   // res.json(JSON.parse(JSON.stringify(result2)));
                 } else{
                     res.json(pwdErrObj);
                 }
             } else{
-
                 res.json(errObj);
             }
         });
@@ -410,22 +365,14 @@ app.post('/login', function (req, res) {
 app.post('/findallusers', function (req, res) {
     //Sample: http://localhost:3000/findallusers
 
-    var errObj = { status: "error", message: "Username Not Found" };
-
     MongoClient.connect(url, function(err, db) {
         assert.equal(null, err);
 
-        city = req.body.city;
-        catlist=req.body.catlist;
-
-        db.collection('Events', function(err, collection) {
-            collection.find({
-                "city": city,
-                "category": { $in: catlist}
-            }).toArray(function(err, items) {
-                console.log(items);
+        db.collection('Person', function(err, collection) {
+            collection.find().toArray(function(err, items) {
                 res.json(items);
             });
+            db.close();
         });
     });
 });
@@ -435,7 +382,7 @@ app.post('/checkuserpref', function (req, res) {
 
     var errObj = { status: "error", message: "Username Not Found" };
 
-    id=req.body.id;
+    email=req.body.email;
 
     MongoClient.connect(url, function(err, db) {
         assert.equal(null, err);
@@ -450,6 +397,7 @@ app.post('/checkuserpref', function (req, res) {
             } else{
                 res.json(errObj);
             }
+            db.close();
         });
     });
 });
@@ -485,19 +433,16 @@ app.post('/updateuser', function (req, res) {
             updateDetail(db, function(err,result2) {
                 if(err){
                     res.json(errObj);
-                }
-                else if(result2){
+                } else if(result2){
                     res.json(succObj);
 
-                }
-                else{
+                } else{
 
                     res.json(updErrObj);
                 }
                 db.close();
             });
         });
-
     } else {
         res.redirect('/login.html');
     }
@@ -515,7 +460,6 @@ app.post('/updatepref', function (req, res) {
     email=req.body.email;
     preferences=req.body.pref;
 
-
     if (req.session && req.session.user) { // Check if session exists
 
         MongoClient.connect(url, function(err, db) {
@@ -524,19 +468,15 @@ app.post('/updatepref', function (req, res) {
             updatePreference (db, function(err,result2) {
                 if(err){
                     res.json(errObj);
-                }
-                else if(result2){
+                } else if(result2){
                     res.json(succObj);
 
-                }
-                else{
-
+                } else{
                     res.json(updErrObj);
                 }
                 db.close();
             });
         });
-
     } else {
         res.redirect('/login.html');
     }
@@ -592,16 +532,14 @@ app.post('/removepref', function (req, res) {
         deletePreference(db, function(err,result2) {
             if(err){
                 res.json(errObj);
-            }
-            else if(result2){
+            } else if(result2){
                 if(result2.result.n==1){
                     res.json(succObj);
                 }
                 else{
                     res.json(errObj);
                 }
-            }
-            else{
+            } else{
 
                 res.json(remErrObj);
             }
@@ -620,9 +558,18 @@ app.post('/addevent', function (req, res) {
     var errObj = { status: "error", message: "Could not insert, Dup found" };
     var inserErrObj = { status: "error", message: "Could not insert, other issue" };
 
+    var currentdate = new Date();
+    var datetime = currentdate.getDate() + ""
+        + (currentdate.getMonth()+1)  + ""
+        + currentdate.getFullYear() + ""
+        + currentdate.getHours() + ""
+        + currentdate.getMinutes() + ""
+        + currentdate.getSeconds();
+
     MongoClient.connect(url, function(err, db) {
         assert.equal(null, err);
 
+        id = datetime;
         name=req.body.name;
         desc=req.body.desc;
         date=req.body.date;
@@ -636,6 +583,7 @@ app.post('/addevent', function (req, res) {
         lat=0;
         lon=0;
         catlist=req.body.catlist;
+        email=req.body.email;
 
         insertEvent(db, function (err, result2) {
             if (err) {
@@ -644,27 +592,35 @@ app.post('/addevent', function (req, res) {
             }
             else if (result2) {
                 if (result2.result.n == 1) {
-                    res.json(succObj);
-                }
-                else {
+                    addHost(db, function(err,result3) {
+                        if(err){
+                            res.json(errObj);
+                        } else if(result3){
+                            if(result3.result.n==1){
+                                res.json(succObj);
+                            }
+                            else{
+                                res.json(inserErrObj);
+                            }
+                        } else{
+                            res.json(errObj);
+                        }
+                    });
+                } else {
                     res.json(inserErrObj);
                 }
-            }
-            else {
+            } else {
 
                 res.json(errObj);
             }
-
+            db.close();
         });
     });
-
 });
 
 
 app.post('/findevents', function (req, res) {
     //Sample: http://localhost:3000/findevents?city=boston
-
-    var errObj = { status: "error", message: "Username Not Found" };
 
     MongoClient.connect(url, function(err, db) {
         assert.equal(null, err);
@@ -680,6 +636,7 @@ app.post('/findevents', function (req, res) {
                 console.log(items);
                 res.json(items);
             });
+            db.close();
         });
     });
 });
@@ -700,10 +657,11 @@ app.post('/eventdetails', function (req, res) {
                 res.json(errObj);
             } else if(result2){
                 result2.status="success";
-                res.json(JSON.parse((JSON.stringify(result2).replace(/}{/g,","))));
+                res.json(result2);
             } else{
                 res.json(errObj);
             }
+            db.close();
         });
     });
 });
@@ -711,22 +669,19 @@ app.post('/eventdetails', function (req, res) {
 app.post('/findallevents', function (req, res) {
     //Sample: http://localhost:3000/findallevents
 
-    var errObj = { status: "error", message: "Event Not Found" };
-
     MongoClient.connect(url, function(err, db) {
         assert.equal(null, err);
 
-        findAllEvents(db, function(err,result2) {
+        city = req.body.city;
+        catlist=req.body.catlist;
 
-            if(err){
-                res.json(errObj);
-            } else if(result2){
-                result2.status="success";
-                console.log(result2);
-                res.json(result2);
-            } else{
-                res.json(errObj);
-            }
+        db.collection('Events', function(err, collection) {
+            collection.find({
+                "is_approved": 0
+            }).toArray(function(err, items) {
+                res.json(items);
+            });
+            db.close();
         });
     });
 });
@@ -739,7 +694,7 @@ app.post('/approveevent', function (req, res) {
     var errObj = { status: "error", message: "Could not update, user not found" };
     var updErrObj = { status: "error", message: "Could not update, other issue" };
 
-    isapproved=req.body.isapproved;
+    id=req.body.id;
 
     MongoClient.connect(url, function(err, db) {
         assert.equal(null, err);
@@ -761,10 +716,9 @@ app.post('/approveevent', function (req, res) {
 
 app.post('/removeevent', function (req, res) {
     //Sample: http://localhost:3000/removeevent?id=123
-    //Make username non changeable
 
     var succObj = { status: "success", message: "User Removed" };
-    var errObj = { status: "error", message: "Could not remove, user not found" };
+    var errObj = { status: "error", message: "Could not remove, event not found" };
     var remErrObj = { status: "error", message: "Could not remove, other issue" };
 
     id=req.query.id;
@@ -790,6 +744,60 @@ app.post('/removeevent', function (req, res) {
         });
     });
 });
+
+
+app.post('/finduserevents', function (req, res) {
+    //Sample: http://localhost:3000/finduserevents
+
+    MongoClient.connect(url, function(err, db) {
+        assert.equal(null, err);
+
+        email = req.body.email;
+
+        db.collection('Host', function(err, collection) {
+            collection.find({
+                "user": email
+            }).toArray(function(err, items) {
+                res.json(items);
+            });
+            db.close();
+        });
+    });
+});
+
+
+app.post('/removehost', function (req, res) {
+    //Sample: http://localhost:3000/removehost?id=123
+
+    var succObj = { status: "success", message: "User Removed" };
+    var errObj = { status: "error", message: "Could not remove, event not found" };
+    var remErrObj = { status: "error", message: "Could not remove, other issue" };
+
+    id=req.query.id;
+
+    MongoClient.connect(url, function(err, db) {
+        assert.equal(null, err);
+
+        removeHost(db, function(err,result2) {
+            if(err){
+                res.json(errObj);
+            } else if(result2){
+
+                if(result2.result.n==1){
+                    res.json(succObj);
+                } else{
+                    res.json(errObj);
+                }
+            } else{
+
+                res.json(remErrObj);
+            }
+            db.close();
+        });
+    });
+});
+
+
 process.on('uncaughtException', function (err) {
   console.log('Caught exception: ' + err);
 });

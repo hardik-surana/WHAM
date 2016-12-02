@@ -24,8 +24,8 @@
       <file leaf-file-name="server.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Node/server.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="525">
-              <caret line="429" column="7" lean-forward="false" selection-start-line="429" selection-start-column="7" selection-end-line="429" selection-end-column="7" />
+            <state relative-caret-position="277">
+              <caret line="653" column="8" lean-forward="false" selection-start-line="653" selection-start-column="8" selection-end-line="653" selection-end-column="8" />
               <folding />
             </state>
           </provider>
@@ -72,6 +72,13 @@
       <find>findeve</find>
       <find>console</find>
       <find>find</find>
+      <find>findallevents</find>
+      <find>findallev</find>
+      <find>findall</find>
+      <find>addho</find>
+      <find>is_enable</find>
+      <find>evetn</find>
+      <find>det</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -103,6 +110,28 @@
     <option name="y" value="-11" />
     <option name="width" value="1942" />
     <option name="height" value="1042" />
+  </component>
+  <component name="ProjectInspectionProfilesVisibleTreeState">
+    <entry key="Project Default">
+      <profile-state>
+        <expanded-state>
+          <State>
+            <id />
+          </State>
+          <State>
+            <id>JavaScript</id>
+          </State>
+          <State>
+            <id>Spelling</id>
+          </State>
+        </expanded-state>
+        <selected-state>
+          <State>
+            <id>Assignment issuesJavaScript</id>
+          </State>
+        </selected-state>
+      </profile-state>
+    </entry>
   </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1">
@@ -156,7 +185,7 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="HbShouldOpenHtmlAsHb" value="" />
     <property name="nodejs_interpreter_path" value="C:/Program Files/nodejs/node" />
-    <property name="settings.editor.selected.configurable" value="vcs.Git" />
+    <property name="settings.editor.selected.configurable" value="Errors" />
     <property name="js.eslint.eslintPackage" value="" />
     <property name="js-jscs-nodeInterpreter" value="C:\Program Files\nodejs\node.exe" />
     <property name="restartRequiresConfirmation" value="false" />
@@ -241,6 +270,7 @@
   <component name="ShelveChangesManager" show_recycled="false">
     <option name="remove_strategy" value="false" />
   </component>
+  <component name="SpellCheckerSettings" BundledDictionaries="4" BundledDictionary0="css.dic" BundledDictionary1="less.dic" BundledDictionary2="jetbrains.dic" BundledDictionary3="english.dic" Folders="0" Dictionaries="0" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="bb73304f-b822-45d1-95c5-517ec7d9f8d6" name="Default" comment="" />
@@ -253,15 +283,15 @@
       <workItem from="1480476901108" duration="48000" />
       <workItem from="1480482781327" duration="705000" />
       <workItem from="1480564935435" duration="5013000" />
-      <workItem from="1480653815470" duration="6631000" />
+      <workItem from="1480653815470" duration="10219000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="29632000" />
+    <option name="totallyTimeSpent" value="33220000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-11" y="-11" width="1942" height="1042" extended-state="7" />
+    <frame x="-11" y="-11" width="1942" height="1042" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24895833" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -400,8 +430,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Node/server.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="525">
-          <caret line="429" column="7" lean-forward="false" selection-start-line="429" selection-start-column="7" selection-end-line="429" selection-end-column="7" />
+        <state relative-caret-position="277">
+          <caret line="653" column="8" lean-forward="false" selection-start-line="653" selection-start-column="8" selection-end-line="653" selection-end-column="8" />
           <folding />
         </state>
       </provider>
