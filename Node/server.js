@@ -703,9 +703,7 @@ app.post('/findallevents', function (req, res) {
         assert.equal(null, err);
 
         db.collection('Events', function(err, collection) {
-            collection.find({
-                "is_approved": 0
-            }).toArray(function(err, items) {
+            collection.find().toArray(function(err, items) {
                 res.json(items);
             });
         });

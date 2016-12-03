@@ -265,8 +265,17 @@ function displayEvents(){
                             tr.append('<th>' + sno + '</th>');
                             tr.append(name);
                             tr.append(description);
-                            tr.append(address);                            
-                            tr.append('<th><button type="button" class="btn btn-primary" id="user'+sno+'" onclick="changeEvent(\''+ id +'\')">Approve</button></th>');                          
+                            tr.append(address);  
+                            console.log(object.is_approved);
+                            if(object.is_approved == 1){
+                                
+                                tr.append('<th><button type="button" class="btn btn-danger" onclick="deleteEvent(\''+ id +'\')">Delete</button></th>');
+                            }
+                            else{
+                                 tr.append('<th><button type="button" class="btn btn-primary" onclick="changeEvent(\''+ id +'\')">Approve</button></th>');
+                                 tr.append('<th><button type="button" class="btn btn-danger" onclick="deleteEvent(\''+ id +'\')">Delete</button></th>');
+                            }                          
+                                                     
                             tbody.append(tr).fadeIn();
                         }
                     });
@@ -281,6 +290,29 @@ function changeEvent(id) {
         data: { id: id }
     }).then(function (data) {
        displayEvents();
+        
+    });
+
+}
+
+function deleteEvent(id) {
+    var root = 'http://localhost:3000/removeevent';
+       
+    $.ajax({
+        url: root,
+        method: 'POST',
+        data: { id: id }
+    }).then(function (data) {
+        if(data.status=="success"){
+            $.ajax({
+        url: 'http://localhost:3000/removehost',
+        method: 'POST',
+        data: { id: id }
+    }).then(function (data) {
+        displayEvents();
+    });
+        }
+       
         
     });
 

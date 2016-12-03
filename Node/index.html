@@ -29,17 +29,9 @@
     </style>
     <script type="text/javascript">
         $(function () {
-            $('#datetimepicker6').datetimepicker();
-            $('#addEvent_datetimepicker').datetimepicker();
-            $('#datetimepicker7').datetimepicker({
-                useCurrent: false //Important! See issue #1075
-            });
-            $("#datetimepicker6").on("dp.change", function (e) {
-                $('#datetimepicker7').data("DateTimePicker").minDate(e.date);
-            });
-            $("#datetimepicker7").on("dp.change", function (e) {
-                $('#datetimepicker6').data("DateTimePicker").maxDate(e.date);
-            });
+            
+            var dateToday = new Date();
+            $('#addEvent_datetimepicker').datetimepicker().data("DateTimePicker").minDate(dateToday);
         });
         $(document).ready(function () {
             $("#fromdate").focusout(function () {
@@ -269,7 +261,7 @@
                                                 <div class="form-group">
                                                     <div class="input-group modal-sm">
                                                         <span class="input-group-addon"><i class="fa fa-phone"></i>City:</span>
-                                                            <select class="form-control" id="addEvent_city">
+                                                        <select class="form-control" id="addEvent_city">
                                                                 <option>Boston</option>
                                                                 <option>New York</option>
                                                                 <option>Los Angeles</option>
@@ -292,11 +284,11 @@
                                                 </div>
                                                 <div class="form-group">
                                                     <div class='input-group date' id='addEvent_datetimepicker'>
-                                                    <input type='text' class="form-control" id="addEvent_date" />
-                                                    <span class="input-group-addon">
+                                                        <input type='text' class="form-control" id="addEvent_date" />
+                                                        <span class="input-group-addon">
                                         <span class="glyphicon glyphicon-calendar"></span>
-                                    </span>
-                                </div>
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             </form>
                                         </div>
@@ -409,7 +401,7 @@
                     <div class="col-md-10">
                         <div class="row">
                             <label for="City">Select City:</label>
-                                <select class="form-control" id="searchByCity">
+                            <select class="form-control" id="searchByCity">
                                     <option>Boston</option>
                                     <option>New York</option>
                                     <option>Los Angeles</option>
