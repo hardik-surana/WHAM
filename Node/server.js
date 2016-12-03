@@ -5,7 +5,6 @@
  TERM:       FALL 2016
  PROFESSOR:  KENNETH BACKLWASKI
  UNIVERSITY: NORTHEASTERN UNIVERSITY, BOSTON
-
  */
 
 var express = require('express');
@@ -15,7 +14,6 @@ var app = express();
 //Body-Parser
 var bodyParser = require('body-parser');
 var multer = require('multer'); // v1.0.5
-var upload = multer(); // for parsing multipart/form-data
 
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
@@ -27,7 +25,6 @@ var session = require('client-sessions');
 //Mongo part
 var MongoClient = require('mongodb').MongoClient;
 var assert = require('assert');
-var ObjectId = require('mongodb').ObjectID;
 var url = 'mongodb://localhost:27017/CS5200';
 
 //DB Functions
@@ -68,12 +65,13 @@ function insertPref (db, callback)  {
 function findUser (db, callback) {
    
     var cursor =db.collection('Person').find({
-        "email": email
+        "email": email,
+        "is_enable": 1
+
     } );
     cursor.next(function(err, doc) {
         callback(err,doc);
     });
-    
 }
 
 
@@ -179,7 +177,6 @@ function eventDetails (db, callback) {
     var cursor =db.collection('Events').find({
         "_id": id
     } );
-    console.log('In query');
     cursor.next(function(err, doc) {
         callback(err,doc);
     });
@@ -225,6 +222,17 @@ function removeHost (db, callback) {
         function(err, dbresult) {
             callback(err,dbresult);
         });
+}
+
+function attending (db, callback) {
+
+    db.collection('Attendance').insertOne({
+        "user": email,
+        "event": id
+
+    }, function (err, dbresult) {
+        callback(err, dbresult);
+    });
 }
 
 //Client Session
@@ -534,7 +542,7 @@ app.post('/removeuser', function (req, res) {
     var errObj = { status: "error", message: "Could not remove, user not found" };
     var remErrObj = { status: "error", message: "Could not remove, other issue" };
 
-    email=req.query.email;
+    email=req.body.email;
 
     MongoClient.connect(url, function(err, db) {
         assert.equal(null, err);
@@ -567,7 +575,7 @@ app.post('/removepref', function (req, res) {
     var errObj = { status: "error", message: "Could not remove, user not found" };
     var remErrObj = { status: "error", message: "Could not remove, other issue" };
 
-    id=req.query.id;
+    id=req.body.id;
 
     MongoClient.connect(url, function(err, db) {
         assert.equal(null, err);
@@ -578,12 +586,10 @@ app.post('/removepref', function (req, res) {
             } else if(result2){
                 if(result2.result.n==1){
                     res.json(succObj);
-                }
-                else{
+                } else{
                     res.json(errObj);
                 }
             } else{
-
                 res.json(remErrObj);
             }
             db.close();
@@ -599,7 +605,6 @@ app.post('/addevent', function (req, res) {
 
     var succObj = { status: "success" };
     var errObj = { status: "error", message: "Could not insert, Dup found" };
-    var inserErrObj = { status: "error", message: "Could not insert, other issue" };
 
     var currentdate = new Date();
     var datetime = currentdate.getDate() + ""
@@ -673,7 +678,6 @@ app.post('/eventdetails', function (req, res) {
     var errObj = { status: "error", message: "Event Not Found" };
 
     id=req.body.id;
-    console.log(id);
     MongoClient.connect(url, function(err, db) {
         assert.equal(null, err);
 
@@ -743,7 +747,7 @@ app.post('/removeevent', function (req, res) {
     var errObj = { status: "error", message: "Could not remove, event not found" };
     var remErrObj = { status: "error", message: "Could not remove, other issue" };
 
-    id=req.query.id;
+    id=req.body.id;
 
     MongoClient.connect(url, function(err, db) {
         assert.equal(null, err);
@@ -752,14 +756,12 @@ app.post('/removeevent', function (req, res) {
             if(err){
                 res.json(errObj);
             } else if(result2){
-
                 if(result2.result.n==1){
                     res.json(succObj);
                 } else{
                     res.json(errObj);
                 }
             } else{
-
                 res.json(remErrObj);
             }
             db.close();
@@ -818,7 +820,7 @@ app.post('/removehost', function (req, res) {
     var errObj = { status: "error", message: "Could not remove, event not found" };
     var remErrObj = { status: "error", message: "Could not remove, other issue" };
 
-    id=req.query.id;
+    id=req.body.id;
 
     MongoClient.connect(url, function(err, db) {
         assert.equal(null, err);
@@ -838,6 +840,29 @@ app.post('/removehost', function (req, res) {
                 res.json(remErrObj);
             }
             db.close();
+        });
+    });
+});
+
+
+app.post('/attending', function (req, res) {
+    //Sample: http://localhost:3000/addevent
+
+    var succObj = { status: "success" };
+    var errObj = { status: "error", message: "Could not insert, Dup found" };
+
+    email = req.body.email;
+    id=req.body.id;
+
+    MongoClient.connect(url, function(err, db) {
+        assert.equal(null, err);
+
+        attending(db, function (err, result2) {
+            if (result2.result.n ==  1) {
+                res.json(succObj);
+            } else {
+                res.json(errObj);
+            }
         });
     });
 });

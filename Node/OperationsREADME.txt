@@ -22,20 +22,9 @@ db.createCollection("Events")
 db.createCollection("Person")
 db.createCollection("Admin")
 db.createCollection("Users")
-db.createCollection("Attendees")
+db.createCollection("Attendance")
+db.createCollection("Host")
 
-db.createCollection("counters")
-db.counters.insert({_id:"personid",sequence_value:0})
-db.counters.insert({_id:"eventid",sequence_value:0})
-
-db.Events.insert({"_id" : "1"})
-db.Person.insert({"_id" : "1"})
-
-db.Events.createIndex({"_id" : 1}, {"unique":true})
-db.Person.createIndex({"_id" : 1}, {"unique":true})
-
-db.Events.remove({"_id" : "1"})
-db.Person.remove({"_id" : "1"})
 
 db.Person.insert({"email" : "abc@def.com"})
 db.Person.createIndex({"email" : 1}, {"unique":true})
@@ -43,9 +32,9 @@ db.Person.remove({"email" : "abc@def.com"})
 
 db.Person.insert({
 "_id": 99999998,
-"first_name": "Sudhanshu",
-"last_name": "Joshi",
-"email": "sudjoshi",
+"first_name": "Hardik",
+"last_name": "Surana",
+"email": "admin",
 "phone": 1234567890,
 "password": "qwerty",
 "address_line1": "123 Abc Ave",
@@ -57,11 +46,9 @@ db.Person.insert({
 "is_enable": 1
 })
 
-db.Users.insert({
-"_id": 99999998,
-"preference": ["Music", "Food", "Art"]})
+db.Users.insert({ "email": "admin", "preference": ["Music", "Food", "Art"]})
 
-db.Users.insert({ "email": "sudjoshi", "preference": ["Music", "Food", "Art"]})
+db.Admin.insert({"_id": 99999998})
 
 Running the server:
 Navigate to Node folder
