@@ -1,15 +1,12 @@
 /*
-       AUTHOR:     SUDHANSHU JOSHI & KARTHIK KAIPA
-       FILE TYPE:  JAVASCRIPT
-       DISCLAIMER: THIS CODE HAS BEEN DONE AS A PART OF MANAGING SOFTWARE DEVELOPMENT COURSE
-       TERM:       FALL 2015
-       PROFESSOR:  MICHAEL ALLEN WEINTRAUB
-       UNIVERSITY: NORTHEASTERN UNIVERSITY, BOSTON
+ AUTHOR:     HARDIK SURANA & SUDHANSHU JOSHI
+ FILE TYPE:  JAVASCRIPT
+ DISCLAIMER: THIS CODE HAS BEEN DONE AS A PART OF DATABASE MANAGEMENT COURSE
+ TERM:       FALL 2016
+ PROFESSOR:  KENNETH BACKLWASKI
+ UNIVERSITY: NORTHEASTERN UNIVERSITY, BOSTON
 
-       APIs used: 
-       Eventful API: For getting event information.
-       Google maps API: For showing the location of the events to user
-*/
+ */
 var markersarray = [];
 	function getEvents()
 	{
@@ -47,7 +44,7 @@ function getEventsDb(){
         }
         else {
 			var tbody = $("#tableBody");
-			tbody.empty();
+			
 			$("#results").show();
             for (var e in data)
 			{
@@ -77,7 +74,7 @@ function getEventsDb(){
 			    //var titleLink = $("<a>").attr("href", eventfulUrl).append(title);
 				var titleLink = "<a href='eventDetails.html?eventid="+ eventid + "' target='_blank'>" + title + "</a>";
 				var titleTd = $("<td style='width:200px; font-size:15px'>").append(titleLink);
-				var titledesc = $("<td style='font-size:15px'>").append("Venue: " + event.venue_name + "</br> Address: " + venueaddress + "</br>Date: " + date+ "</br>Time: " + time);//(jQuery.trim(description).substring(0, 200).replace('<br>', '').split(" ").slice(0, -1).join(" ") + "...");
+				var titledesc = $("<td style='font-size:15px'>").append("Address: " + venueaddress + "</br>Date: " + date+ "</br>Time: " + time);//(jQuery.trim(description).substring(0, 200).replace('<br>', '').split(" ").slice(0, -1).join(" ") + "...");
 				
 				tr.append(titleTd);
 				tr.append(titledesc);
@@ -98,6 +95,7 @@ function getEventsDb(){
 	{
 
 			var tbody = $("#tableBody"); 
+			tbody.empty();
 			var template = $("#template").clone();
 			var bounds = new google.maps.LatLngBounds();
 			var infoWindowContent = {};
@@ -174,7 +172,7 @@ function getEventsDb(){
 		map.fitBounds(bounds);
 			}
 			
-			
+			getEventsDb();
 		}
 		function clearMarkers(myLatLng)
 		{
@@ -299,6 +297,7 @@ function getEventsDb(){
 	}
 	function getEventsWithPreferences(preferences) {
 	    clearMarkers();
+		
 	    if (preferences !== [])
 	    {
 	        var pref = "";
@@ -314,7 +313,7 @@ function getEventsDb(){
 	            success: renderEvents
 	        })
 	    }
-	    
+			    
 	}
 	function getDirections(latitude, longitude)
 	{

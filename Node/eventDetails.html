@@ -79,7 +79,7 @@
         });
     </script>
 
-    <title>MSD Project</title>
+    <title>DBMS Project</title>
 
 </head>
 <body onload="checkLogin()">
@@ -205,6 +205,172 @@
                             </div>
                         </div>
                     </li>
+                    <li id="addEvents">
+                        <a href="#" data-toggle="modal" data-target="#bannerformmodalevents">Add Event</a>
+
+                        <div class="modal fade bannerformmodal" tabindex="-1" role="dialog" aria-labelledby="bannerformmodalevents" aria-hidden="true"
+                            id="bannerformmodalevents">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                            <h4 class="modal-title" id="myModalLabel">Add Event</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form id="requestacallform" method="POST" name="requestacallform">
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-user"></i>Event Name:</span>
+                                                        <input id="addEvent_name" type="text" class="form-control" value="" name="first_name" />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-user"></i>Event Description:</span>
+                                                        <input id="addEvent_description" type="text" class="form-control" value="" name="last_name" />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="prefs" class="control-label">Category:</label>
+                                                    <select class="selectpicker show-tick" data-width="100%" id="category" multiple data-max-options="5" required>
+                                                        <option id="art" value="art">Art</option>
+                                                        <option id="books" value="books">Books</option>
+                                                        <option id="comedy" value="comedy">Comedy</option>
+                                                        <option id="food" value="food">Food</option>
+                                                        <option id="music" value="music">Music</option>
+                                                        <option id="sales" value="sales">Sales</option>
+                                                        <option id="science" value="science">Science</option>
+                                                        <option id="sports" value="sports">Sports</option>
+                                                        <option id="technology" value="technology">Technology</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-group"></i>Address Line1:</span>
+                                                        <input id="addEvent_add1" type="text" class="form-control" value="" name="address" />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-group"></i>Address Line 2:</span>
+                                                        <input id="addEvent_add2" type="text" class="form-control" value="" name="address" />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="input-group modal-sm">
+                                                        <span class="input-group-addon"><i class="fa fa-phone"></i>City:</span>
+                                                            <select class="form-control" id="addEvent_city">
+                                                                <option>Boston</option>
+                                                                <option>New York</option>
+                                                                <option>Los Angeles</option>
+                                                                <option>San Fransisco</option>
+                                                                <option>Austin</option>
+                                                            </select>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="input-group modal-sm">
+                                                        <span class="input-group-addon"><i class="fa fa-phone"></i>State:</span>
+                                                        <input id="addEvent_state" type="text" class="form-control" value="" name="state" />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="input-group modal-sm">
+                                                        <span class="input-group-addon"><i class="fa fa-phone"></i>Zipcode:</span>
+                                                        <input id="addEvent_zipcode" type="text" class="form-control" value="" name="zipcode" />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class='input-group date' id='addEvent_datetimepicker'>
+                                                    <input type='text' class="form-control" id="addEvent_date" />
+                                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </span>
+                                </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-blue" data-dismiss="modal" aria-hidden="true">Close</button>
+                                            <button type="button" class="btn btn-primary" id="myacc_submit" onclick="addEvent()">Submit</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li id="manageEvents">
+                        <a href="#" data-toggle="modal" data-target="#bannerformmodal1" onclick="displayEvents()">Manage Events</a>
+                        <div class="modal fade bannerformmodal" tabindex="-1" role="dialog" aria-labelledby="bannerformmodal1" aria-hidden="true"
+                            id="bannerformmodal1">
+                            <div class="modal-dialog">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                                <h4 class="modal-title" id="myModalLabel">Manage Events</h4>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="table-responsive" id="eventApprovalTable">
+                                                    <table class="table table-hover" id="eventTable">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>#</th>
+                                                                <th>Event Name</th>
+                                                                <th>Event Description</th>
+                                                                <th>Address</th>
+                                                                <th>Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-blue" data-dismiss="modal" aria-hidden="true">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    </li>
+                    <li id="manageUsers">
+                        <a href="#" data-toggle="modal" data-target="#bannerformmodal2" onclick="displayUsers()">Manage Users</a>
+                        <div class="modal fade bannerformmodal" tabindex="-1" role="dialog" aria-labelledby="bannerformmodal2" aria-hidden="true"
+                            id="bannerformmodal2">
+                            <div class="modal-dialog">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                                <h4 class="modal-title" id="myModalLabel">Manage Users</h4>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="table-responsive" id="eventApprovalTable">
+                                                    <table class="table table-hover" id="userTable">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>#</th>
+                                                                <th>First Name</th>
+                                                                <th>Last Name</th>
+                                                                <th>Address</th>
+                                                                <th>Email</th>
+                                                                <th>Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-blue" data-dismiss="modal" aria-hidden="true">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    </li>
                     <li id="registerNav"><a href="register.html"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
                     <li id="loginNav"><a href="login.html"><span class="glyphicon glyphicon-log-in"></span> Log In</a></li>
                     <li id="logoutNav"><a href="#" onclick="logout()"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
@@ -293,7 +459,7 @@
     </div>
     <footer class="footer">
         <div class="container-fluid">
-            <p class="muted credit">Copyright© 2015 Team KHAS</p>
+            <p class="muted credit">Copyright© 2016 Hardik Surana &amp; Sudhanshu Joshi</p>
         </div>
     </footer>
 </body>

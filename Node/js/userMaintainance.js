@@ -1,15 +1,12 @@
 ﻿/*
-       AUTHOR:     SUDHANSHU JOSHI & KARTHIK KAIPA
-       FILE TYPE:  JAVASCRIPT
-       DISCLAIMER: THIS CODE HAS BEEN DONE AS A PART OF MANAGING SOFTWARE DEVELOPMENT COURSE
-       TERM:       FALL 2015
-       PROFESSOR:  MICHAEL ALLEN WEINTRAUB
-       UNIVERSITY: NORTHEASTERN UNIVERSITY, BOSTON
+ AUTHOR:     HARDIK SURANA & SUDHANSHU JOSHI
+ FILE TYPE:  JAVASCRIPT
+ DISCLAIMER: THIS CODE HAS BEEN DONE AS A PART OF DATABASE MANAGEMENT COURSE
+ TERM:       FALL 2016
+ PROFESSOR:  KENNETH BACKLWASKI
+ UNIVERSITY: NORTHEASTERN UNIVERSITY, BOSTON
 
-       APIs used: 
-       Eventful API: For getting event information.
-       Google maps API: For showing the location of the events to user
-*/
+ */
 
 function login() {
     var emailid = $("#email").val();
@@ -113,7 +110,7 @@ function checkUserLogin() {
             $("#checkrow").append(checkbox);
             
         }
-        getEventsDb();
+        
     }
     else {
         
@@ -196,24 +193,96 @@ function displayUsers() {
 						url: 'http://localhost:3000/findallusers',
 						method: 'POST',
 					}).then(function (data) {
+                        console.log(data);
                         var tbody = $("#userTable"); 
                         tbody.find("tr:gt(0)").remove();
                         for(var i in data){
                             var tr = $("<tr>");
+                            var th = $("<th>");
                             var object = data[i];
-                            var firstName = object.first_name;
-                            var lastName = object.last_name;
-                            var address = object.address_line1 + ',' + object.address_line2 + ',' + object.city + ',' + object.state + ',' +object.zipcode;
-                            var email = object.email;
+                            var firstName = '<th>' + object.first_name + '</th>';
+                            var lastName = '<th>' +object.last_name+ '</th>';
+                            var address = '<th>' +object.address_line1 + ', ' + object.address_line2 + ', ' + object.city + ', ' + object.state + ', ' +object.zipcode+ '</th>';
+                            var email ='<th>' + object.email+ '</th>';
                             
-                            
-                            tr.append(titleTd);
-                            tr.append(titledesc);
+                            var sno = Number(i) + 1;
+                            tr.append('<th>' + sno + '</th>');
+                            tr.append(firstName);
+                            tr.append(lastName);
+                            tr.append(address);
+                            tr.append(email);
+                            //console.log(object.is_enable);
+                            if(object.is_enable==1){
+                                tr.append('<th><button type="button" class="btn btn-danger" id="user'+sno+'" onclick="changeUser(\''+ object.email +'\',\''+ object.is_enable+'\')">Disable</button></th>');
+                            }
+                            else{
+                                tr.append('<th><button type="button" class="btn btn-primary" id="user'+sno+'" onclick="changeUser(\''+ object.email +'\',\''+ object.is_enable+'\')">Enable</button></th>');
+                            }
+                            tbody.append(tr).fadeIn();
                         }
                     });
 }
 
-function displayUnapprovedEvents() {
+function changeUser(email, value){
+    var enable = null;
+    console.log(value);
+    var root = 'http://localhost:3000/updateaccess';
+    if(value=="1"){
+        enable = 0;
+    }
+    else{
+        enable = 1;
+    }
+    $.ajax({
+        url: root,
+        method: 'POST',
+        data: { email: email, isenable : enable }
+    }).then(function (data) {
+       displayUsers();
+        
+    });
+
+
+  
+}
+
+function displayEvents(){
+    $.ajax({
+						url: 'http://localhost:3000/findallevents',
+						method: 'POST',
+					}).then(function (data) {
+                        //console.log(data);
+                        var tbody = $("#eventTable"); 
+                        tbody.find("tr:gt(0)").remove();
+                        for(var i in data){
+                            var tr = $("<tr>");
+                            var object = data[i];
+                            var name = '<th>' + object.name + '</th>';
+                            var address = '<th>' +object.address_line1 + ', ' + object.address_line2 + ', ' + object.city + ', ' + object.state + ', ' +object.zipcode+ '</th>';
+                            var description ='<th>' + object.description+ '</th>';
+                            var id = object._id;
+                            var sno = Number(i) + 1;
+                            tr.append('<th>' + sno + '</th>');
+                            tr.append(name);
+                            tr.append(description);
+                            tr.append(address);                            
+                            tr.append('<th><button type="button" class="btn btn-primary" id="user'+sno+'" onclick="changeEvent(\''+ id +'\')">Approve</button></th>');                          
+                            tbody.append(tr).fadeIn();
+                        }
+                    });
+}
+function changeEvent(id) {
+    var root = 'http://localhost:3000/approveevent';
+    console.log(id);
+   
+    $.ajax({
+        url: root,
+        method: 'POST',
+        data: { id: id }
+    }).then(function (data) {
+       displayEvents();
+        
+    });
 
 }
 
