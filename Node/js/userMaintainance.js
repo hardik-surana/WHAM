@@ -17,7 +17,7 @@ function login() {
         method: 'POST',
         data: { email: emailid, pwd: password }
     }).then(function (data) {
-        //console.log(data);
+        
         if (data.status == "error") {
             $("#login").append("<div class='alert alert-danger' role='alert'><strong>Error:</strong> " + data.message + "</div>");
         }
@@ -44,7 +44,7 @@ function register() {
     var phone = $("#phone").val();
     var prefs = $("#prefs").val();
 
-    //console.log(prefs);
+    
 
     var root = 'http://localhost:3000/addperson';
     var root2 = 'http://localhost:3000/addpref';
@@ -54,7 +54,7 @@ function register() {
         method: 'POST',
         data: { email: email, pw: password, fn: firstname, ln: lastname, adl1: address1, adl2: address2, cty: city, ste: state, zp: zipcode, ph: phone }
     }).then(function (data) {
-        //console.log(data);
+        
         if (data.status == "error") {
             $("#regForm").append("<div class='alert alert-danger' role='alert'><strong>Error:</strong> " + data.message + "</div>");
         }
@@ -66,7 +66,7 @@ function register() {
         method: 'POST',
         data: { email: email, pref: prefs }
     }).then(function (data) {
-        //console.log(data);
+        
         if (data.status == "error") {
             $("#regForm").append("<div class='alert alert-danger' role='alert'><strong>Error:</strong> " + data.message + "</div>");
         }
@@ -86,12 +86,12 @@ function checkUserLogin() {
     if (sessionStorage.getItem('loginStatus') == 'true' && localStorage.getItem('session') == 'true') {
 
         var userData = JSON.parse(sessionStorage.getItem('userDetail'));
-        //console.log(userData);
+        
         $("#registerNav").hide();
         $("#loginNav").hide();
         $("#logoutNav").show();
         $('#addEvents').show();
-        console.log(userData);
+        
         if (userData.is_admin === 1) {
             $('#manageUsers').show();
             $('#manageEvents').show();
@@ -127,7 +127,7 @@ function checkLogin() {
     if (sessionStorage.getItem('loginStatus') == 'true' && localStorage.getItem('session') == 'true') {
 
         var userData = JSON.parse(sessionStorage.getItem('userDetail'));
-        //console.log(userData);
+        
         $("#registerNav").hide();
         $("#loginNav").hide();
         $("#logoutNav").show();
@@ -176,7 +176,7 @@ function addPref() {
         $plus.attr("disabled", "disabled");
     }
 
-    //console.log(prefCount);
+   
 
 }
 
@@ -193,7 +193,7 @@ function displayUsers() {
 						url: 'http://localhost:3000/findallusers',
 						method: 'POST',
 					}).then(function (data) {
-                        console.log(data);
+                        
                         var tbody = $("#userTable"); 
                         tbody.find("tr:gt(0)").remove();
                         for(var i in data){
@@ -211,7 +211,7 @@ function displayUsers() {
                             tr.append(lastName);
                             tr.append(address);
                             tr.append(email);
-                            //console.log(object.is_enable);
+                            
                             if(object.is_enable==1){
                                 tr.append('<th><button type="button" class="btn btn-danger" id="user'+sno+'" onclick="changeUser(\''+ object.email +'\',\''+ object.is_enable+'\')">Disable</button></th>');
                             }
@@ -225,7 +225,7 @@ function displayUsers() {
 
 function changeUser(email, value){
     var enable = null;
-    console.log(value);
+    
     var root = 'http://localhost:3000/updateaccess';
     if(value=="1"){
         enable = 0;
@@ -251,7 +251,7 @@ function displayEvents(){
 						url: 'http://localhost:3000/findallevents',
 						method: 'POST',
 					}).then(function (data) {
-                        //console.log(data);
+                        
                         var tbody = $("#eventTable"); 
                         tbody.find("tr:gt(0)").remove();
                         for(var i in data){
@@ -273,7 +273,7 @@ function displayEvents(){
 }
 function changeEvent(id) {
     var root = 'http://localhost:3000/approveevent';
-    console.log(id);
+    
    
     $.ajax({
         url: root,
@@ -307,7 +307,7 @@ function addEvent() {
         method: 'POST',
         data: { email: email, name: eventName, desc: eventDesc, date: eventDate, time: eventTime, tickets: 'No tickets', adl1: eventAdd1, adl2: eventAdd2, cty: eventCity, ste: eventState, zp: eventZip, catlist: eventCategory }
     }).then(function (data) {
-        console.log(data);
+       
         if (data.status == "error") {
             $("#regForm").append("<div class='alert alert-danger' role='alert'><strong>Error:</strong> " + data.message + "</div>");
         }
@@ -340,7 +340,6 @@ function display_details() {
     $("#myacc_zipcode").attr("value", userData.zipcode);
     $("#myacc_phone").attr("value", userData.phone);
     var prefList = userData.preference;
-    //console.log(prefList);
     for (pref in prefList) {
         var prf = "#" + prefList[pref];
 
@@ -363,14 +362,14 @@ function updateProfile() {
         pass = $("#myacc_newpassword").val()
     }
 
-    //console.log(pass);
+    
 
     $.ajax({
         url: root,
         method: 'POST',
         data: { email: $("#myacc_email").val(), pw: pass, fn: $("#myacc_first_name").val(), ln: $("#myacc_last_name").val(), adl1: $("#myacc_address1").val(), adl2: $("#myacc_address2").val(), cty: $("#myacc_city").val(), ste: $("#myacc_state").val(), zp: $("#myacc_zipcode").val(), ph: $("#myacc_phone").val(), "isadmin": userData.is_admin, "isenable": userData.is_enable }
     }).then(function (data) {
-        //console.log(data);
+        
         if (data.status == "error") {
             $("#requestacallform").append("<div class='alert alert-danger' role='alert'><strong>Error:</strong> " + data.message + "</div>");
         }
@@ -380,7 +379,7 @@ function updateProfile() {
         method: 'POST',
         data: { email: $("#myacc_email").val(), pref: $("#prefs").val() }
     }).then(function (data) {
-        //console.log(data);
+        
         if (data.status == "error") {
             //$("#requestacallform").append("<div class='alert alert-danger' role='alert'><strong>Error:</strong> " + data.message + "</div>");
         }
@@ -395,7 +394,7 @@ function updateProfile() {
         method: 'POST',
         data: { email: $("#myacc_email").val(), pwd: pass }
     }).then(function (data) {
-        //console.log(data);
+        
         if (data.status == "error") {
             $("#login").append("<div class='alert alert-danger' role='alert'><strong>Error:</strong> " + data.message + "</div>");
         }
@@ -413,7 +412,7 @@ function logout() {
         url: 'http://localhost:3000/logout',
         method: 'GET',
     }).then(function (data) {
-        //console.log(data);
+        
         if (data.status == "success") {
             sessionStorage.clear();
             localStorage.setItem('session', 'false');
