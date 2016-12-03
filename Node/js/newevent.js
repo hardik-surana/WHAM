@@ -315,6 +315,22 @@ function getEventsDb(){
 	    }
 			    
 	}
+	function attending(){
+		//
+		var id = window.location.href.split("=")[1];
+		var userData = JSON.parse(sessionStorage.getItem('userDetail'));
+		var email = userData.email;
+		 $.ajax({
+        url: 'http://localhost:3000/attending',
+        method: 'POST',
+        data: { email: email, id:id }
+    }).then(function (data) {
+		if(data.status == "success"){
+			$('#attendingButton').prop('disabled', true);
+		}
+	});
+	}
+
 	function getDirections(latitude, longitude)
 	{
 	    var directionsDisplay;

@@ -434,22 +434,25 @@ function checkBox_event() {
 }
 
 function deleteUser() {
-    $.ajax({
-        url: 'http://localhost:3000/removepref' + $("#myacc_email").val(),
-        method: 'GET'
-    });
 
     $.ajax({
-        url: 'http://localhost:3000/removeuser?us=' + $("#myacc_email").val(),
-        method: 'GET'
+        url: 'http://localhost:3000/removepref',
+        method: 'POST',
+        data: { email: $("#myacc_email").val()}
     }).then(function (data) {
-        //console.log(data);
-        if (data.status == "success") {
+        $.ajax({
+        url: 'http://localhost:3000/removeuser',
+        method: 'POST',
+        data: { email: $("#myacc_email").val()}
+    }).then(function (data) {
+         if (data.status == "success") {
             sessionStorage.clear();
             localStorage.setItem('session', 'false');
             window.location.replace("\login.html");
         }
     });
+    });
+    
 
 
 }

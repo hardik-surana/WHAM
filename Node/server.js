@@ -575,7 +575,7 @@ app.post('/removepref', function (req, res) {
     var errObj = { status: "error", message: "Could not remove, user not found" };
     var remErrObj = { status: "error", message: "Could not remove, other issue" };
 
-    id=req.body.id;
+    email=req.body.email;
 
     MongoClient.connect(url, function(err, db) {
         assert.equal(null, err);
