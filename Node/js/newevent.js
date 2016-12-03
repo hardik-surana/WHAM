@@ -189,16 +189,16 @@ function getEventsDb(){
                  "&app_key=kk7Jzr3BP47vLZH6",
 	        dataType: "jsonp",
 	        success: function (response) {
-				//console.log(response);
+				
 				if(response.hasOwnProperty('status')){
-					//console.log('In else');
+					
 					$.ajax({
 						url: 'http://localhost:3000/eventdetails',
 						method: 'POST',
 						data: { id:eventId }
 					}).then(function (data) {
 				var title = data.name;
-	            //console.log(title);
+	            
 				var description = data.description;
 	            var venue = data.address_line1 + ',' + data.address_line2 + ',' + data.city + ',' +data.state+ ',' +data.zipcode;
 	            var evwhen = data.date;
